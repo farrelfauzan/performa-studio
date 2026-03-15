@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Field, FieldError } from '@/components/ui/field'
-import { useAuthStore } from '@/stores/auth-store'
 import { useRouter } from '@tanstack/react-router'
 import { validateWithZod } from '@/lib/utils'
+import { loginFn } from '@/server/auth'
+import { useState } from 'react'
 
 const emailSchema = z.email({
   error: 'Invalid email address',
@@ -17,7 +18,7 @@ const passwordSchema = z
 
 export function LoginForm() {
   const router = useRouter()
-  const { setAuth } = useAuthStore()
+  const [serverError, setServerError] = useState<string | null>(null)
 
   const form = useForm({
     defaultValues: {
@@ -25,10 +26,15 @@ export function LoginForm() {
       password: '',
     },
     onSubmit: async ({ value }) => {
-      console.log('Login data:', value)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      setAuth()
-      router.navigate({ to: '/' })
+      setServerError(null)
+      const result = await loginFn({ data: value })
+
+      if (result.error) {
+        setServerError(result.error)
+        return
+      }
+
+      router.navigate({ to: '/dashboard' })
     },
   })
 
@@ -41,6 +47,12 @@ export function LoginForm() {
       }}
       className="flex flex-col gap-6"
     >
+      {serverError && (
+        <div className="rounded-lg bg-red-500/15 border border-red-500/25 px-4 py-3 text-sm text-red-300">
+          {serverError}
+        </div>
+      )}
+
       <form.Field
         name="email"
         validators={{

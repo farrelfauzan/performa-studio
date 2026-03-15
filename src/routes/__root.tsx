@@ -4,7 +4,7 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import appCss from '../styles.css?url'
-import { AuthProvider } from '@/auth'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -38,7 +38,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <TooltipProvider>{children}</TooltipProvider>
         <TanStackDevtools
           config={{
             position: 'bottom-right',
