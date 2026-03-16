@@ -15,6 +15,7 @@ import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as dashboardDashboardIndexRouteImport } from './routes/(dashboard)/dashboard/index'
 import { Route as dashboardDashboardStudioRouteImport } from './routes/(dashboard)/dashboard/studio'
 import { Route as dashboardDashboardStudioCreateRouteImport } from './routes/(dashboard)/dashboard/studio_.create'
+import { Route as dashboardDashboardStudioContentIdRouteImport } from './routes/(dashboard)/dashboard/studio_.$contentId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -48,6 +49,12 @@ const dashboardDashboardStudioCreateRoute =
     path: '/studio/create',
     getParentRoute: () => dashboardDashboardRoute,
   } as any)
+const dashboardDashboardStudioContentIdRoute =
+  dashboardDashboardStudioContentIdRouteImport.update({
+    id: '/studio_/$contentId',
+    path: '/studio/$contentId',
+    getParentRoute: () => dashboardDashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -55,6 +62,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof dashboardDashboardRouteWithChildren
   '/dashboard/studio': typeof dashboardDashboardStudioRoute
   '/dashboard/': typeof dashboardDashboardIndexRoute
+  '/dashboard/studio/$contentId': typeof dashboardDashboardStudioContentIdRoute
   '/dashboard/studio/create': typeof dashboardDashboardStudioCreateRoute
 }
 export interface FileRoutesByTo {
@@ -62,6 +70,7 @@ export interface FileRoutesByTo {
   '/login': typeof authLoginRoute
   '/dashboard/studio': typeof dashboardDashboardStudioRoute
   '/dashboard': typeof dashboardDashboardIndexRoute
+  '/dashboard/studio/$contentId': typeof dashboardDashboardStudioContentIdRoute
   '/dashboard/studio/create': typeof dashboardDashboardStudioCreateRoute
 }
 export interface FileRoutesById {
@@ -71,6 +80,7 @@ export interface FileRoutesById {
   '/(dashboard)/dashboard': typeof dashboardDashboardRouteWithChildren
   '/(dashboard)/dashboard/studio': typeof dashboardDashboardStudioRoute
   '/(dashboard)/dashboard/': typeof dashboardDashboardIndexRoute
+  '/(dashboard)/dashboard/studio_/$contentId': typeof dashboardDashboardStudioContentIdRoute
   '/(dashboard)/dashboard/studio_/create': typeof dashboardDashboardStudioCreateRoute
 }
 export interface FileRouteTypes {
@@ -81,6 +91,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dashboard/studio'
     | '/dashboard/'
+    | '/dashboard/studio/$contentId'
     | '/dashboard/studio/create'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -88,6 +99,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/dashboard/studio'
     | '/dashboard'
+    | '/dashboard/studio/$contentId'
     | '/dashboard/studio/create'
   id:
     | '__root__'
@@ -96,6 +108,7 @@ export interface FileRouteTypes {
     | '/(dashboard)/dashboard'
     | '/(dashboard)/dashboard/studio'
     | '/(dashboard)/dashboard/'
+    | '/(dashboard)/dashboard/studio_/$contentId'
     | '/(dashboard)/dashboard/studio_/create'
   fileRoutesById: FileRoutesById
 }
@@ -149,18 +162,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof dashboardDashboardStudioCreateRouteImport
       parentRoute: typeof dashboardDashboardRoute
     }
+    '/(dashboard)/dashboard/studio_/$contentId': {
+      id: '/(dashboard)/dashboard/studio_/$contentId'
+      path: '/studio/$contentId'
+      fullPath: '/dashboard/studio/$contentId'
+      preLoaderRoute: typeof dashboardDashboardStudioContentIdRouteImport
+      parentRoute: typeof dashboardDashboardRoute
+    }
   }
 }
 
 interface dashboardDashboardRouteChildren {
   dashboardDashboardStudioRoute: typeof dashboardDashboardStudioRoute
   dashboardDashboardIndexRoute: typeof dashboardDashboardIndexRoute
+  dashboardDashboardStudioContentIdRoute: typeof dashboardDashboardStudioContentIdRoute
   dashboardDashboardStudioCreateRoute: typeof dashboardDashboardStudioCreateRoute
 }
 
 const dashboardDashboardRouteChildren: dashboardDashboardRouteChildren = {
   dashboardDashboardStudioRoute: dashboardDashboardStudioRoute,
   dashboardDashboardIndexRoute: dashboardDashboardIndexRoute,
+  dashboardDashboardStudioContentIdRoute:
+    dashboardDashboardStudioContentIdRoute,
   dashboardDashboardStudioCreateRoute: dashboardDashboardStudioCreateRoute,
 }
 

@@ -89,7 +89,10 @@ function CreateContentPage() {
     await new Promise((r) => setTimeout(r, 1500))
     toast.success('Content published successfully!')
     setSubmitting(false)
-    navigate({ to: '/dashboard/studio', search: { view: 'grid' } })
+    navigate({
+      to: '/dashboard/studio',
+      search: { view: 'grid', page: 0, q: '' },
+    })
   }
 
   return (
@@ -100,7 +103,10 @@ function CreateContentPage() {
           variant="outline"
           size="icon-sm"
           onClick={() =>
-            navigate({ to: '/dashboard/studio', search: { view: 'grid' } })
+            navigate({
+              to: '/dashboard/studio',
+              search: { view: 'grid', page: 0, q: '' },
+            })
           }
         >
           <ArrowLeft className="h-4 w-4" />

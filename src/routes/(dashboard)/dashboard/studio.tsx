@@ -1,16 +1,18 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { LayoutGrid, List, Plus } from 'lucide-react'
 import { useStudioProjects } from '@/hooks/use-studio'
 import { PerformaTable, type Column } from '@/components/performa-table'
 import { PerformaGrid } from '@/components/performa-grid'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import type { StudioProject } from '@/lib/dummy-data'
 
 type ViewMode = 'grid' | 'list'
 
 const STATUS_STYLES: Record<StudioProject['status'], string> = {
-  draft: 'bg-yellow-500/15 text-yellow-400',
-  'in-progress': 'bg-blue-500/15 text-blue-400',
-  published: 'bg-green-500/15 text-green-400',
+  draft: 'bg-yellow-500/15 text-yellow-400 border-transparent',
+  'in-progress': 'bg-blue-500/15 text-blue-400 border-transparent',
+  published: 'bg-green-500/15 text-green-400 border-transparent',
 }
 
 const studioColumns: Column<StudioProject>[] = [
@@ -32,11 +34,11 @@ const studioColumns: Column<StudioProject>[] = [
     key: 'status',
     header: 'Status',
     render: (p) => (
-      <span
-        className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${STATUS_STYLES[p.status]}`}
+      <Badge
+        className={`text-[12px] capitalize py-3 ${STATUS_STYLES[p.status]}`}
       >
         {p.status}
-      </span>
+      </Badge>
     ),
   },
   {
@@ -55,18 +57,43 @@ export const Route = createFileRoute('/(dashboard)/dashboard/studio')({
   component: StudioPage,
   validateSearch: (search: Record<string, unknown>) => ({
     view: (search.view === 'list' ? 'list' : 'grid') as ViewMode,
+    page: Number(search.page) || 0,
+    q: typeof search.q === 'string' ? search.q : '',
   }),
 })
 
 function StudioPage() {
   const { data: projects, isLoading } = useStudioProjects()
-  const { view } = Route.useSearch()
-  const navigate = Route.useNavigate()
+  const { view, page, q } = Route.useSearch()
+  const navigate = useNavigate()
+  const routeNavigate = Route.useNavigate()
 
   const setView = (v: ViewMode) => {
-    navigate({
-      search: { view: v },
+    routeNavigate({
+      search: (prev) => ({ ...prev, view: v }),
       replace: true,
+    })
+  }
+
+  const setPage = (p: number) => {
+    routeNavigate({
+      search: (prev) => ({ ...prev, page: p }),
+      replace: true,
+    })
+  }
+
+  const setSearch = (search: string) => {
+    routeNavigate({
+      search: (prev) => ({ ...prev, q: search }),
+      replace: true,
+    })
+  }
+
+  const openDetail = (project: StudioProject) => {
+    navigate({
+      to: '/dashboard/studio/$contentId',
+      params: { contentId: String(project.id) },
+      search: { view, page, q },
     })
   }
 
@@ -82,36 +109,29 @@ function StudioPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <Link
-            to="/dashboard/studio/create"
-            className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-500"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            Create
-          </Link>
+          <Button asChild>
+            <Link to="/dashboard/studio/create">
+              <Plus className="h-3.5 w-3.5" />
+              Create
+            </Link>
+          </Button>
 
           {/* View toggle */}
           <div className="flex items-center gap-1 rounded-lg border border-white/12 bg-white/5 p-1">
-            <button
+            <Button
+              variant={view === 'grid' ? 'secondary' : 'ghost'}
+              size="icon-sm"
               onClick={() => setView('grid')}
-              className={`flex items-center justify-center rounded-md p-1.5 transition-colors ${
-                view === 'grid'
-                  ? 'bg-white/12 text-white'
-                  : 'text-white/40 hover:text-white/70'
-              }`}
             >
               <LayoutGrid className="h-4 w-4" />
-            </button>
-            <button
+            </Button>
+            <Button
+              variant={view === 'list' ? 'secondary' : 'ghost'}
+              size="icon-sm"
               onClick={() => setView('list')}
-              className={`flex items-center justify-center rounded-md p-1.5 transition-colors ${
-                view === 'list'
-                  ? 'bg-white/12 text-white'
-                  : 'text-white/40 hover:text-white/70'
-              }`}
             >
               <List className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -124,6 +144,12 @@ function StudioPage() {
           pageSize={9}
           searchPlaceholder="Search projects..."
           getSearchValue={(p) => p.title}
+          onItemClick={openDetail}
+          page={page}
+          skeletonCount={9}
+          onPageChange={setPage}
+          search={q}
+          onSearchChange={setSearch}
           renderItem={(project) => (
             <div className="group rounded-2xl border border-white/12 bg-white/5 backdrop-blur-xl p-5 transition-colors hover:bg-white/8 cursor-pointer">
               <div className="h-28 rounded-xl bg-white/5 mb-4 overflow-hidden">
@@ -142,11 +168,11 @@ function StudioPage() {
                     {project.updatedAt} &middot; {project.duration}
                   </p>
                 </div>
-                <span
-                  className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${STATUS_STYLES[project.status]}`}
+                <Badge
+                  className={`shrink-0 text-[12px] capitalize py-3 ${STATUS_STYLES[project.status]}`}
                 >
                   {project.status}
-                </span>
+                </Badge>
               </div>
             </div>
           )}
@@ -159,6 +185,11 @@ function StudioPage() {
           pageSize={10}
           searchPlaceholder="Search projects..."
           getSearchValue={(p) => p.title}
+          onRowClick={openDetail}
+          page={page}
+          onPageChange={setPage}
+          search={q}
+          onSearchChange={setSearch}
         />
       )}
     </div>
