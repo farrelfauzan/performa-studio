@@ -3,6 +3,7 @@
 export type DashboardStat = {
   label: string
   value: string
+  change?: number
 }
 
 export type ActivityItem = {
@@ -10,6 +11,14 @@ export type ActivityItem = {
   action: string
   target: string
   time: string
+}
+
+export type MostWatchedVideo = {
+  id: number
+  title: string
+  thumbnail: string
+  views: number
+  duration: string
 }
 
 export type StudioProject = {
@@ -24,9 +33,9 @@ export type StudioProject = {
 // ─── Dashboard data ─────────────────────────────────────────────────────
 
 export const DASHBOARD_STATS: DashboardStat[] = [
-  { label: 'Total Projects', value: '12' },
-  { label: 'Active Sessions', value: '3' },
-  { label: 'Storage Used', value: '2.4 GB' },
+  { label: 'Total Projects', value: '12', change: 8.2 },
+  { label: 'Total Followers', value: '4,832', change: 12.5 },
+  { label: 'Total Views', value: '128.4K', change: -3.1 },
 ]
 
 export const DASHBOARD_ACTIVITY: ActivityItem[] = [
@@ -59,6 +68,37 @@ export const DASHBOARD_ACTIVITY: ActivityItem[] = [
     action: 'Uploaded media',
     target: 'Client Footage Pack',
     time: '3 days ago',
+  },
+]
+
+export const MOST_WATCHED_VIDEOS: MostWatchedVideo[] = [
+  {
+    id: 1,
+    title: 'How to Build a Design System',
+    thumbnail: 'https://picsum.photos/seed/mw1/400/225',
+    views: 45200,
+    duration: '12:34',
+  },
+  {
+    id: 2,
+    title: 'Advanced React Patterns 2026',
+    thumbnail: 'https://picsum.photos/seed/mw2/400/225',
+    views: 38700,
+    duration: '18:22',
+  },
+  {
+    id: 3,
+    title: 'UI Animation Masterclass',
+    thumbnail: 'https://picsum.photos/seed/mw3/400/225',
+    views: 31500,
+    duration: '24:15',
+  },
+  {
+    id: 4,
+    title: 'TypeScript Tips & Tricks',
+    thumbnail: 'https://picsum.photos/seed/mw4/400/225',
+    views: 28900,
+    duration: '9:45',
   },
 ]
 
