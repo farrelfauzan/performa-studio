@@ -1,5 +1,5 @@
 import { Link, useMatchRoute, useRouter } from '@tanstack/react-router'
-import { LayoutDashboard, Clapperboard, LogOut } from 'lucide-react'
+import { LayoutDashboard, Clapperboard, BarChart3, LogOut } from 'lucide-react'
 import { logoutFn } from '@/server/auth'
 import {
   Sidebar,
@@ -25,6 +25,11 @@ const sidebarItems = [
     label: 'Studio',
     to: '/dashboard/studio',
     icon: Clapperboard,
+  },
+  {
+    label: 'Analytics',
+    to: '/dashboard/analytics',
+    icon: BarChart3,
   },
 ] as const
 
@@ -74,7 +79,7 @@ export function DashboardSidebar() {
                       tooltip={item.label}
                       className="text-white/60 hover:bg-white/8 hover:text-white/90 data-[active=true]:bg-white/15 data-[active=true]:text-white data-[active=true]:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]"
                     >
-                      <Link to={item.to}>
+                      <Link to={item.to} search={{} as any}>
                         <item.icon />
                         <span>{item.label}</span>
                       </Link>
