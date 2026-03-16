@@ -21,9 +21,14 @@ type PerformaTableProps<T> = {
   data: T[]
   columns: Column<T>[]
   pageSize?: number
+  page?: number
+  onPageChange?: (page: number) => void
+  search?: string
+  onSearchChange?: (search: string) => void
   searchable?: boolean
   searchPlaceholder?: string
   getSearchValue?: (item: T) => string
+  onRowClick?: (item: T) => void
   isLoading?: boolean
   skeletonRows?: number
 }
@@ -32,14 +37,30 @@ export function PerformaTable<T>({
   data,
   columns,
   pageSize = 10,
+  page: controlledPage,
+  onPageChange,
+  search: controlledSearch,
+  onSearchChange,
   searchable = true,
   searchPlaceholder = 'Search...',
   getSearchValue,
+  onRowClick,
   isLoading = false,
   skeletonRows = 5,
 }: PerformaTableProps<T>) {
-  const [search, setSearch] = useState('')
-  const [page, setPage] = useState(0)
+  const [internalSearch, setInternalSearch] = useState('')
+  const [internalPage, setInternalPage] = useState(0)
+
+  const search = controlledSearch ?? internalSearch
+  const setSearch = (v: string) => {
+    onSearchChange ? onSearchChange(v) : setInternalSearch(v)
+  }
+
+  const page = controlledPage ?? internalPage
+  const setPage = (v: number | ((prev: number) => number)) => {
+    const next = typeof v === 'function' ? v(page) : v
+    onPageChange ? onPageChange(next) : setInternalPage(next)
+  }
 
   const filtered = useMemo(() => {
     if (!search.trim() || !getSearchValue) return data
@@ -48,12 +69,16 @@ export function PerformaTable<T>({
   }, [data, search, getSearchValue])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
-  const paginated = filtered.slice(page * pageSize, (page + 1) * pageSize)
+  const effectivePage = Math.min(page, totalPages - 1)
+  const paginated = filtered.slice(
+    effectivePage * pageSize,
+    (effectivePage + 1) * pageSize,
+  )
 
   // Reset to first page when search changes
   const handleSearch = (value: string) => {
     setSearch(value)
-    setPage(0)
+    if (!onPageChange) setPage(0)
   }
 
   return (
@@ -105,6 +130,7 @@ export function PerformaTable<T>({
                   <TableRow
                     key={i}
                     className="border-white/8 hover:bg-white/5 cursor-pointer transition-colors"
+                    onClick={() => onRowClick?.(item)}
                   >
                     {columns.map((col) => (
                       <TableCell key={col.key} className={col.className}>
@@ -131,24 +157,24 @@ export function PerformaTable<T>({
       {!isLoading && filtered.length > pageSize && (
         <div className="flex items-center justify-between text-xs text-white/40">
           <span>
-            Showing {page * pageSize + 1}–
-            {Math.min((page + 1) * pageSize, filtered.length)} of{' '}
+            Showing {effectivePage * pageSize + 1}–
+            {Math.min((effectivePage + 1) * pageSize, filtered.length)} of{' '}
             {filtered.length}
           </span>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setPage((p) => Math.max(0, p - 1))}
-              disabled={page === 0}
+              disabled={effectivePage === 0}
               className="flex items-center justify-center rounded-md p-1.5 transition-colors hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <span className="px-2 text-white/60">
-              {page + 1} / {totalPages}
+              {effectivePage + 1} / {totalPages}
             </span>
             <button
               onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-              disabled={page >= totalPages - 1}
+              disabled={effectivePage >= totalPages - 1}
               className="flex items-center justify-center rounded-md p-1.5 transition-colors hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <ChevronRight className="h-4 w-4" />
