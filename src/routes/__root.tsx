@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import appCss from '../styles.css?url'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { Toaster } from '@/components/ui/sonner'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -52,6 +53,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         />
         <ReactQueryDevtools buttonPosition="bottom-left" />
         <Scripts />
+        <Toaster />
       </body>
     </html>
   )
