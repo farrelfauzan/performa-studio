@@ -14,9 +14,12 @@ import { Route as dashboardDashboardRouteImport } from './routes/(dashboard)/das
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as dashboardDashboardIndexRouteImport } from './routes/(dashboard)/dashboard/index'
 import { Route as dashboardDashboardStudioRouteImport } from './routes/(dashboard)/dashboard/studio'
+import { Route as dashboardDashboardCommunityRouteImport } from './routes/(dashboard)/dashboard/community'
 import { Route as dashboardDashboardAnalyticsRouteImport } from './routes/(dashboard)/dashboard/analytics'
 import { Route as dashboardDashboardStudioCreateRouteImport } from './routes/(dashboard)/dashboard/studio_.create'
 import { Route as dashboardDashboardStudioContentIdRouteImport } from './routes/(dashboard)/dashboard/studio_.$contentId'
+import { Route as dashboardDashboardCommunitySubscriptionEditRouteImport } from './routes/(dashboard)/dashboard/community_.subscription-edit'
+import { Route as dashboardDashboardCommunitySubscriptionCreateRouteImport } from './routes/(dashboard)/dashboard/community_.subscription-create'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -44,6 +47,12 @@ const dashboardDashboardStudioRoute =
     path: '/studio',
     getParentRoute: () => dashboardDashboardRoute,
   } as any)
+const dashboardDashboardCommunityRoute =
+  dashboardDashboardCommunityRouteImport.update({
+    id: '/community',
+    path: '/community',
+    getParentRoute: () => dashboardDashboardRoute,
+  } as any)
 const dashboardDashboardAnalyticsRoute =
   dashboardDashboardAnalyticsRouteImport.update({
     id: '/analytics',
@@ -62,14 +71,29 @@ const dashboardDashboardStudioContentIdRoute =
     path: '/studio/$contentId',
     getParentRoute: () => dashboardDashboardRoute,
   } as any)
+const dashboardDashboardCommunitySubscriptionEditRoute =
+  dashboardDashboardCommunitySubscriptionEditRouteImport.update({
+    id: '/community_/subscription-edit',
+    path: '/community/subscription-edit',
+    getParentRoute: () => dashboardDashboardRoute,
+  } as any)
+const dashboardDashboardCommunitySubscriptionCreateRoute =
+  dashboardDashboardCommunitySubscriptionCreateRouteImport.update({
+    id: '/community_/subscription-create',
+    path: '/community/subscription-create',
+    getParentRoute: () => dashboardDashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof authLoginRoute
   '/dashboard': typeof dashboardDashboardRouteWithChildren
   '/dashboard/analytics': typeof dashboardDashboardAnalyticsRoute
+  '/dashboard/community': typeof dashboardDashboardCommunityRoute
   '/dashboard/studio': typeof dashboardDashboardStudioRoute
   '/dashboard/': typeof dashboardDashboardIndexRoute
+  '/dashboard/community/subscription-create': typeof dashboardDashboardCommunitySubscriptionCreateRoute
+  '/dashboard/community/subscription-edit': typeof dashboardDashboardCommunitySubscriptionEditRoute
   '/dashboard/studio/$contentId': typeof dashboardDashboardStudioContentIdRoute
   '/dashboard/studio/create': typeof dashboardDashboardStudioCreateRoute
 }
@@ -77,8 +101,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof authLoginRoute
   '/dashboard/analytics': typeof dashboardDashboardAnalyticsRoute
+  '/dashboard/community': typeof dashboardDashboardCommunityRoute
   '/dashboard/studio': typeof dashboardDashboardStudioRoute
   '/dashboard': typeof dashboardDashboardIndexRoute
+  '/dashboard/community/subscription-create': typeof dashboardDashboardCommunitySubscriptionCreateRoute
+  '/dashboard/community/subscription-edit': typeof dashboardDashboardCommunitySubscriptionEditRoute
   '/dashboard/studio/$contentId': typeof dashboardDashboardStudioContentIdRoute
   '/dashboard/studio/create': typeof dashboardDashboardStudioCreateRoute
 }
@@ -88,8 +115,11 @@ export interface FileRoutesById {
   '/(auth)/login': typeof authLoginRoute
   '/(dashboard)/dashboard': typeof dashboardDashboardRouteWithChildren
   '/(dashboard)/dashboard/analytics': typeof dashboardDashboardAnalyticsRoute
+  '/(dashboard)/dashboard/community': typeof dashboardDashboardCommunityRoute
   '/(dashboard)/dashboard/studio': typeof dashboardDashboardStudioRoute
   '/(dashboard)/dashboard/': typeof dashboardDashboardIndexRoute
+  '/(dashboard)/dashboard/community_/subscription-create': typeof dashboardDashboardCommunitySubscriptionCreateRoute
+  '/(dashboard)/dashboard/community_/subscription-edit': typeof dashboardDashboardCommunitySubscriptionEditRoute
   '/(dashboard)/dashboard/studio_/$contentId': typeof dashboardDashboardStudioContentIdRoute
   '/(dashboard)/dashboard/studio_/create': typeof dashboardDashboardStudioCreateRoute
 }
@@ -100,8 +130,11 @@ export interface FileRouteTypes {
     | '/login'
     | '/dashboard'
     | '/dashboard/analytics'
+    | '/dashboard/community'
     | '/dashboard/studio'
     | '/dashboard/'
+    | '/dashboard/community/subscription-create'
+    | '/dashboard/community/subscription-edit'
     | '/dashboard/studio/$contentId'
     | '/dashboard/studio/create'
   fileRoutesByTo: FileRoutesByTo
@@ -109,8 +142,11 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/dashboard/analytics'
+    | '/dashboard/community'
     | '/dashboard/studio'
     | '/dashboard'
+    | '/dashboard/community/subscription-create'
+    | '/dashboard/community/subscription-edit'
     | '/dashboard/studio/$contentId'
     | '/dashboard/studio/create'
   id:
@@ -119,8 +155,11 @@ export interface FileRouteTypes {
     | '/(auth)/login'
     | '/(dashboard)/dashboard'
     | '/(dashboard)/dashboard/analytics'
+    | '/(dashboard)/dashboard/community'
     | '/(dashboard)/dashboard/studio'
     | '/(dashboard)/dashboard/'
+    | '/(dashboard)/dashboard/community_/subscription-create'
+    | '/(dashboard)/dashboard/community_/subscription-edit'
     | '/(dashboard)/dashboard/studio_/$contentId'
     | '/(dashboard)/dashboard/studio_/create'
   fileRoutesById: FileRoutesById
@@ -168,6 +207,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof dashboardDashboardStudioRouteImport
       parentRoute: typeof dashboardDashboardRoute
     }
+    '/(dashboard)/dashboard/community': {
+      id: '/(dashboard)/dashboard/community'
+      path: '/community'
+      fullPath: '/dashboard/community'
+      preLoaderRoute: typeof dashboardDashboardCommunityRouteImport
+      parentRoute: typeof dashboardDashboardRoute
+    }
     '/(dashboard)/dashboard/analytics': {
       id: '/(dashboard)/dashboard/analytics'
       path: '/analytics'
@@ -189,21 +235,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof dashboardDashboardStudioContentIdRouteImport
       parentRoute: typeof dashboardDashboardRoute
     }
+    '/(dashboard)/dashboard/community_/subscription-edit': {
+      id: '/(dashboard)/dashboard/community_/subscription-edit'
+      path: '/community/subscription-edit'
+      fullPath: '/dashboard/community/subscription-edit'
+      preLoaderRoute: typeof dashboardDashboardCommunitySubscriptionEditRouteImport
+      parentRoute: typeof dashboardDashboardRoute
+    }
+    '/(dashboard)/dashboard/community_/subscription-create': {
+      id: '/(dashboard)/dashboard/community_/subscription-create'
+      path: '/community/subscription-create'
+      fullPath: '/dashboard/community/subscription-create'
+      preLoaderRoute: typeof dashboardDashboardCommunitySubscriptionCreateRouteImport
+      parentRoute: typeof dashboardDashboardRoute
+    }
   }
 }
 
 interface dashboardDashboardRouteChildren {
   dashboardDashboardAnalyticsRoute: typeof dashboardDashboardAnalyticsRoute
+  dashboardDashboardCommunityRoute: typeof dashboardDashboardCommunityRoute
   dashboardDashboardStudioRoute: typeof dashboardDashboardStudioRoute
   dashboardDashboardIndexRoute: typeof dashboardDashboardIndexRoute
+  dashboardDashboardCommunitySubscriptionCreateRoute: typeof dashboardDashboardCommunitySubscriptionCreateRoute
+  dashboardDashboardCommunitySubscriptionEditRoute: typeof dashboardDashboardCommunitySubscriptionEditRoute
   dashboardDashboardStudioContentIdRoute: typeof dashboardDashboardStudioContentIdRoute
   dashboardDashboardStudioCreateRoute: typeof dashboardDashboardStudioCreateRoute
 }
 
 const dashboardDashboardRouteChildren: dashboardDashboardRouteChildren = {
   dashboardDashboardAnalyticsRoute: dashboardDashboardAnalyticsRoute,
+  dashboardDashboardCommunityRoute: dashboardDashboardCommunityRoute,
   dashboardDashboardStudioRoute: dashboardDashboardStudioRoute,
   dashboardDashboardIndexRoute: dashboardDashboardIndexRoute,
+  dashboardDashboardCommunitySubscriptionCreateRoute:
+    dashboardDashboardCommunitySubscriptionCreateRoute,
+  dashboardDashboardCommunitySubscriptionEditRoute:
+    dashboardDashboardCommunitySubscriptionEditRoute,
   dashboardDashboardStudioContentIdRoute:
     dashboardDashboardStudioContentIdRoute,
   dashboardDashboardStudioCreateRoute: dashboardDashboardStudioCreateRoute,

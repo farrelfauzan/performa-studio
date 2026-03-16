@@ -1,5 +1,11 @@
 import { Link, useMatchRoute, useRouter } from '@tanstack/react-router'
-import { LayoutDashboard, Clapperboard, BarChart3, LogOut } from 'lucide-react'
+import {
+  LayoutDashboard,
+  Clapperboard,
+  BarChart3,
+  MessagesSquare,
+  LogOut,
+} from 'lucide-react'
 import { logoutFn } from '@/server/auth'
 import {
   Sidebar,
@@ -30,6 +36,11 @@ const sidebarItems = [
     label: 'Analytics',
     to: '/dashboard/analytics',
     icon: BarChart3,
+  },
+  {
+    label: 'Community',
+    to: '/dashboard/community',
+    icon: MessagesSquare,
   },
 ] as const
 
