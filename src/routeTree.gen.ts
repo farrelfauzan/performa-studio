@@ -14,6 +14,7 @@ import { Route as dashboardDashboardRouteImport } from './routes/(dashboard)/das
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as dashboardDashboardIndexRouteImport } from './routes/(dashboard)/dashboard/index'
 import { Route as dashboardDashboardStudioRouteImport } from './routes/(dashboard)/dashboard/studio'
+import { Route as dashboardDashboardAnalyticsRouteImport } from './routes/(dashboard)/dashboard/analytics'
 import { Route as dashboardDashboardStudioCreateRouteImport } from './routes/(dashboard)/dashboard/studio_.create'
 import { Route as dashboardDashboardStudioContentIdRouteImport } from './routes/(dashboard)/dashboard/studio_.$contentId'
 
@@ -43,6 +44,12 @@ const dashboardDashboardStudioRoute =
     path: '/studio',
     getParentRoute: () => dashboardDashboardRoute,
   } as any)
+const dashboardDashboardAnalyticsRoute =
+  dashboardDashboardAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => dashboardDashboardRoute,
+  } as any)
 const dashboardDashboardStudioCreateRoute =
   dashboardDashboardStudioCreateRouteImport.update({
     id: '/studio_/create',
@@ -60,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof authLoginRoute
   '/dashboard': typeof dashboardDashboardRouteWithChildren
+  '/dashboard/analytics': typeof dashboardDashboardAnalyticsRoute
   '/dashboard/studio': typeof dashboardDashboardStudioRoute
   '/dashboard/': typeof dashboardDashboardIndexRoute
   '/dashboard/studio/$contentId': typeof dashboardDashboardStudioContentIdRoute
@@ -68,6 +76,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof authLoginRoute
+  '/dashboard/analytics': typeof dashboardDashboardAnalyticsRoute
   '/dashboard/studio': typeof dashboardDashboardStudioRoute
   '/dashboard': typeof dashboardDashboardIndexRoute
   '/dashboard/studio/$contentId': typeof dashboardDashboardStudioContentIdRoute
@@ -78,6 +87,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/(auth)/login': typeof authLoginRoute
   '/(dashboard)/dashboard': typeof dashboardDashboardRouteWithChildren
+  '/(dashboard)/dashboard/analytics': typeof dashboardDashboardAnalyticsRoute
   '/(dashboard)/dashboard/studio': typeof dashboardDashboardStudioRoute
   '/(dashboard)/dashboard/': typeof dashboardDashboardIndexRoute
   '/(dashboard)/dashboard/studio_/$contentId': typeof dashboardDashboardStudioContentIdRoute
@@ -89,6 +99,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/dashboard'
+    | '/dashboard/analytics'
     | '/dashboard/studio'
     | '/dashboard/'
     | '/dashboard/studio/$contentId'
@@ -97,6 +108,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/dashboard/analytics'
     | '/dashboard/studio'
     | '/dashboard'
     | '/dashboard/studio/$contentId'
@@ -106,6 +118,7 @@ export interface FileRouteTypes {
     | '/'
     | '/(auth)/login'
     | '/(dashboard)/dashboard'
+    | '/(dashboard)/dashboard/analytics'
     | '/(dashboard)/dashboard/studio'
     | '/(dashboard)/dashboard/'
     | '/(dashboard)/dashboard/studio_/$contentId'
@@ -155,6 +168,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof dashboardDashboardStudioRouteImport
       parentRoute: typeof dashboardDashboardRoute
     }
+    '/(dashboard)/dashboard/analytics': {
+      id: '/(dashboard)/dashboard/analytics'
+      path: '/analytics'
+      fullPath: '/dashboard/analytics'
+      preLoaderRoute: typeof dashboardDashboardAnalyticsRouteImport
+      parentRoute: typeof dashboardDashboardRoute
+    }
     '/(dashboard)/dashboard/studio_/create': {
       id: '/(dashboard)/dashboard/studio_/create'
       path: '/studio/create'
@@ -173,6 +193,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface dashboardDashboardRouteChildren {
+  dashboardDashboardAnalyticsRoute: typeof dashboardDashboardAnalyticsRoute
   dashboardDashboardStudioRoute: typeof dashboardDashboardStudioRoute
   dashboardDashboardIndexRoute: typeof dashboardDashboardIndexRoute
   dashboardDashboardStudioContentIdRoute: typeof dashboardDashboardStudioContentIdRoute
@@ -180,6 +201,7 @@ interface dashboardDashboardRouteChildren {
 }
 
 const dashboardDashboardRouteChildren: dashboardDashboardRouteChildren = {
+  dashboardDashboardAnalyticsRoute: dashboardDashboardAnalyticsRoute,
   dashboardDashboardStudioRoute: dashboardDashboardStudioRoute,
   dashboardDashboardIndexRoute: dashboardDashboardIndexRoute,
   dashboardDashboardStudioContentIdRoute:

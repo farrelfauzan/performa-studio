@@ -18,6 +18,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { fetchContentDetail, type ContentDetail } from '@/lib/dummy-data'
+import { Badge } from '@/components/ui/badge'
 
 // ─── Route ──────────────────────────────────────────────────────────────
 
@@ -119,11 +120,11 @@ function ContentDetailPage() {
             <h1 className="truncate text-2xl font-bold text-white">
               {content.title}
             </h1>
-            <span
-              className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[content.status]}`}
+            <Badge
+              className={`shrink-0 text-[12px] capitalize py-3 ${STATUS_STYLES[content.status]}`}
             >
               {content.status}
-            </span>
+            </Badge>
           </div>
           <p className="mt-0.5 text-sm text-white/50">{content.description}</p>
         </div>
