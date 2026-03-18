@@ -87,7 +87,7 @@ function CreateContentPage() {
   const handleFinish = async () => {
     setSubmitting(true)
     await new Promise((r) => setTimeout(r, 1500))
-    toast.success('Content published successfully!')
+    toast.success('Content submitted for approval!')
     setSubmitting(false)
     navigate({
       to: '/dashboard/studio',

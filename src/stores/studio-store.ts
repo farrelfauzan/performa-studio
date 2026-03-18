@@ -54,6 +54,7 @@ type StudioFormActions = {
 
   // Validation
   validateStep: (step: number) => boolean
+  clearError: (key: string) => void
   clearErrors: () => void
 
   // Submit state
@@ -89,7 +90,14 @@ export const useStudioStore = create<StudioFormState & StudioFormActions>(
   (set, get) => ({
     ...initialState,
 
-    setField: (key, value) => set({ [key]: value }),
+    setField: (key, value) =>
+      set((s) => {
+        if (s.errors[key as string]) {
+          const { [key as string]: _, ...rest } = s.errors
+          return { [key]: value, errors: rest }
+        }
+        return { [key]: value }
+      }),
 
     setStep: (step) => set({ step }),
 
@@ -110,11 +118,21 @@ export const useStudioStore = create<StudioFormState & StudioFormActions>(
       })),
 
     updateSection: (id, patch) =>
-      set((s) => ({
-        sections: s.sections.map((sec) =>
-          sec.id === id ? { ...sec, ...patch } : sec,
-        ),
-      })),
+      set((s) => {
+        const sIdx = s.sections.findIndex((sec) => sec.id === id)
+        const newErrors = { ...s.errors }
+        if (sIdx >= 0) {
+          for (const field of Object.keys(patch)) {
+            delete newErrors[`sections.${sIdx}.${field}`]
+          }
+        }
+        return {
+          sections: s.sections.map((sec) =>
+            sec.id === id ? { ...sec, ...patch } : sec,
+          ),
+          errors: newErrors,
+        }
+      }),
 
     removeSection: (id) =>
       set((s) => ({
@@ -146,18 +164,32 @@ export const useStudioStore = create<StudioFormState & StudioFormActions>(
       })),
 
     updateVideo: (sectionId, videoId, patch) =>
-      set((s) => ({
-        sections: s.sections.map((sec) =>
-          sec.id === sectionId
-            ? {
-                ...sec,
-                videos: sec.videos.map((v) =>
-                  v.id === videoId ? { ...v, ...patch } : v,
-                ),
-              }
-            : sec,
-        ),
-      })),
+      set((s) => {
+        const sIdx = s.sections.findIndex((sec) => sec.id === sectionId)
+        const vIdx =
+          sIdx >= 0
+            ? s.sections[sIdx].videos.findIndex((v) => v.id === videoId)
+            : -1
+        const newErrors = { ...s.errors }
+        if (sIdx >= 0 && vIdx >= 0) {
+          for (const field of Object.keys(patch)) {
+            delete newErrors[`sections.${sIdx}.videos.${vIdx}.${field}`]
+          }
+        }
+        return {
+          sections: s.sections.map((sec) =>
+            sec.id === sectionId
+              ? {
+                  ...sec,
+                  videos: sec.videos.map((v) =>
+                    v.id === videoId ? { ...v, ...patch } : v,
+                  ),
+                }
+              : sec,
+          ),
+          errors: newErrors,
+        }
+      }),
 
     removeVideo: (sectionId, videoId) =>
       set((s) => ({
@@ -193,6 +225,7 @@ export const useStudioStore = create<StudioFormState & StudioFormActions>(
       }
 
       const result = schema.safeParse(stepData[step])
+      console.log('Validation result for step', step, result)
       if (result.success) {
         set({ errors: {} })
         return true
@@ -208,6 +241,13 @@ export const useStudioStore = create<StudioFormState & StudioFormActions>(
       set({ errors })
       return false
     },
+
+    clearError: (key) =>
+      set((s) => {
+        if (!s.errors[key]) return s
+        const { [key]: _, ...rest } = s.errors
+        return { errors: rest }
+      }),
 
     clearErrors: () => set({ errors: {} }),
 

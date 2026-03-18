@@ -21,9 +21,15 @@ export const Route = createFileRoute('/(dashboard)/dashboard')({
     }
     return { user }
   },
+  loader: async () => {
+    const user = await getSession()
+    return { user: user! }
+  },
 })
 
 function DashboardLayout() {
+  const { user } = Route.useLoaderData()
+
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-950 via-blue-950 to-indigo-950">
       {/* Decorative background elements */}
@@ -34,7 +40,7 @@ function DashboardLayout() {
       </div>
 
       <SidebarProvider>
-        <DashboardSidebar />
+        <DashboardSidebar user={user} />
         <SidebarInset className="bg-transparent">
           {/* Top bar */}
           <header className="flex h-14 items-center gap-2 border-b border-white/8 px-4">

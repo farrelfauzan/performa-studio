@@ -14,6 +14,7 @@ import { Route as dashboardDashboardRouteImport } from './routes/(dashboard)/das
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as dashboardDashboardIndexRouteImport } from './routes/(dashboard)/dashboard/index'
 import { Route as dashboardDashboardStudioRouteImport } from './routes/(dashboard)/dashboard/studio'
+import { Route as dashboardDashboardSettingsRouteImport } from './routes/(dashboard)/dashboard/settings'
 import { Route as dashboardDashboardCommunityRouteImport } from './routes/(dashboard)/dashboard/community'
 import { Route as dashboardDashboardAnalyticsRouteImport } from './routes/(dashboard)/dashboard/analytics'
 import { Route as dashboardDashboardStudioCreateRouteImport } from './routes/(dashboard)/dashboard/studio_.create'
@@ -45,6 +46,12 @@ const dashboardDashboardStudioRoute =
   dashboardDashboardStudioRouteImport.update({
     id: '/studio',
     path: '/studio',
+    getParentRoute: () => dashboardDashboardRoute,
+  } as any)
+const dashboardDashboardSettingsRoute =
+  dashboardDashboardSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
     getParentRoute: () => dashboardDashboardRoute,
   } as any)
 const dashboardDashboardCommunityRoute =
@@ -90,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof dashboardDashboardRouteWithChildren
   '/dashboard/analytics': typeof dashboardDashboardAnalyticsRoute
   '/dashboard/community': typeof dashboardDashboardCommunityRoute
+  '/dashboard/settings': typeof dashboardDashboardSettingsRoute
   '/dashboard/studio': typeof dashboardDashboardStudioRoute
   '/dashboard/': typeof dashboardDashboardIndexRoute
   '/dashboard/community/subscription-create': typeof dashboardDashboardCommunitySubscriptionCreateRoute
@@ -102,6 +110,7 @@ export interface FileRoutesByTo {
   '/login': typeof authLoginRoute
   '/dashboard/analytics': typeof dashboardDashboardAnalyticsRoute
   '/dashboard/community': typeof dashboardDashboardCommunityRoute
+  '/dashboard/settings': typeof dashboardDashboardSettingsRoute
   '/dashboard/studio': typeof dashboardDashboardStudioRoute
   '/dashboard': typeof dashboardDashboardIndexRoute
   '/dashboard/community/subscription-create': typeof dashboardDashboardCommunitySubscriptionCreateRoute
@@ -116,6 +125,7 @@ export interface FileRoutesById {
   '/(dashboard)/dashboard': typeof dashboardDashboardRouteWithChildren
   '/(dashboard)/dashboard/analytics': typeof dashboardDashboardAnalyticsRoute
   '/(dashboard)/dashboard/community': typeof dashboardDashboardCommunityRoute
+  '/(dashboard)/dashboard/settings': typeof dashboardDashboardSettingsRoute
   '/(dashboard)/dashboard/studio': typeof dashboardDashboardStudioRoute
   '/(dashboard)/dashboard/': typeof dashboardDashboardIndexRoute
   '/(dashboard)/dashboard/community_/subscription-create': typeof dashboardDashboardCommunitySubscriptionCreateRoute
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dashboard/analytics'
     | '/dashboard/community'
+    | '/dashboard/settings'
     | '/dashboard/studio'
     | '/dashboard/'
     | '/dashboard/community/subscription-create'
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/dashboard/analytics'
     | '/dashboard/community'
+    | '/dashboard/settings'
     | '/dashboard/studio'
     | '/dashboard'
     | '/dashboard/community/subscription-create'
@@ -156,6 +168,7 @@ export interface FileRouteTypes {
     | '/(dashboard)/dashboard'
     | '/(dashboard)/dashboard/analytics'
     | '/(dashboard)/dashboard/community'
+    | '/(dashboard)/dashboard/settings'
     | '/(dashboard)/dashboard/studio'
     | '/(dashboard)/dashboard/'
     | '/(dashboard)/dashboard/community_/subscription-create'
@@ -207,6 +220,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof dashboardDashboardStudioRouteImport
       parentRoute: typeof dashboardDashboardRoute
     }
+    '/(dashboard)/dashboard/settings': {
+      id: '/(dashboard)/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof dashboardDashboardSettingsRouteImport
+      parentRoute: typeof dashboardDashboardRoute
+    }
     '/(dashboard)/dashboard/community': {
       id: '/(dashboard)/dashboard/community'
       path: '/community'
@@ -255,6 +275,7 @@ declare module '@tanstack/react-router' {
 interface dashboardDashboardRouteChildren {
   dashboardDashboardAnalyticsRoute: typeof dashboardDashboardAnalyticsRoute
   dashboardDashboardCommunityRoute: typeof dashboardDashboardCommunityRoute
+  dashboardDashboardSettingsRoute: typeof dashboardDashboardSettingsRoute
   dashboardDashboardStudioRoute: typeof dashboardDashboardStudioRoute
   dashboardDashboardIndexRoute: typeof dashboardDashboardIndexRoute
   dashboardDashboardCommunitySubscriptionCreateRoute: typeof dashboardDashboardCommunitySubscriptionCreateRoute
@@ -266,6 +287,7 @@ interface dashboardDashboardRouteChildren {
 const dashboardDashboardRouteChildren: dashboardDashboardRouteChildren = {
   dashboardDashboardAnalyticsRoute: dashboardDashboardAnalyticsRoute,
   dashboardDashboardCommunityRoute: dashboardDashboardCommunityRoute,
+  dashboardDashboardSettingsRoute: dashboardDashboardSettingsRoute,
   dashboardDashboardStudioRoute: dashboardDashboardStudioRoute,
   dashboardDashboardIndexRoute: dashboardDashboardIndexRoute,
   dashboardDashboardCommunitySubscriptionCreateRoute:

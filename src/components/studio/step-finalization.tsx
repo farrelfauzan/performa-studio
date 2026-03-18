@@ -1,3 +1,4 @@
+import { Info } from 'lucide-react'
 import { useStudioStore } from '@/stores/studio-store'
 import { Card, CardContent } from '@/components/ui/card'
 
@@ -32,6 +33,18 @@ export function StepFinalization() {
         <p className="mt-1 text-sm text-white/40">
           Review your content before publishing
         </p>
+      </div>
+
+      {/* Approval notice */}
+      <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
+        <Info className="mt-0.5 size-4 shrink-0 text-amber-400" />
+        <div className="text-sm">
+          <p className="font-medium text-amber-400">Admin Approval Required</p>
+          <p className="mt-0.5 text-muted-foreground">
+            All new content will be reviewed by the Performa admin team before
+            going live. You will be notified once your content is approved.
+          </p>
+        </div>
       </div>
 
       {/* Summary cards */}

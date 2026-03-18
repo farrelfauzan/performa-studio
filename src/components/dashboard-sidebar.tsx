@@ -5,6 +5,8 @@ import {
   BarChart3,
   MessagesSquare,
   LogOut,
+  Settings,
+  ChevronsUpDown,
 } from 'lucide-react'
 import { logoutFn } from '@/server/auth'
 import {
@@ -20,6 +22,15 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from '@/components/ui/sidebar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { Separator } from '@/components/ui/separator'
+import type { SessionUser } from '@/server/auth'
+import { Button } from './ui/button'
 
 const sidebarItems = [
   {
@@ -44,9 +55,23 @@ const sidebarItems = [
   },
 ] as const
 
-export function DashboardSidebar() {
+const FALLBACK_USER: SessionUser = {
+  id: '0',
+  email: 'guest@performa.io',
+  name: 'Guest User',
+  role: 'user',
+}
+
+export function DashboardSidebar({ user: userProp }: { user: SessionUser }) {
+  const user = userProp ?? FALLBACK_USER
   const matchRoute = useMatchRoute()
   const router = useRouter()
+
+  const initials = (user?.name ?? '')
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
 
   return (
     <Sidebar
@@ -103,21 +128,87 @@ export function DashboardSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* Bottom section */}
+      {/* Bottom section — Profile */}
       <SidebarFooter className="border-t border-white/8">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={async () => {
-                await logoutFn()
-                router.navigate({ to: '/login' })
-              }}
-              tooltip="Sign out"
-              className="text-white/50 hover:bg-white/8 hover:text-white/80 cursor-pointer"
-            >
-              <LogOut />
-              <span>Sign out</span>
-            </SidebarMenuButton>
+            <Popover>
+              <PopoverTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  tooltip={user.name}
+                  className="text-white/70 hover:bg-white/8 hover:text-white cursor-pointer"
+                >
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage
+                      src={`https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(user.name)}`}
+                      alt={user.name}
+                    />
+                    <AvatarFallback className="bg-white/15 text-white text-xs">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-medium text-white">
+                      {user.name}
+                    </span>
+                    <span className="truncate text-xs text-white/50">
+                      {user.email}
+                    </span>
+                  </div>
+                  <ChevronsUpDown className="ml-auto size-4 text-white/40" />
+                </SidebarMenuButton>
+              </PopoverTrigger>
+              <PopoverContent
+                side="top"
+                align="start"
+                className="w-56 rounded-lg border-white/12 bg-slate-900/95 p-1 backdrop-blur-xl"
+              >
+                {/* User info header */}
+                <div className="flex items-center gap-3 px-3 py-2">
+                  <Avatar className="h-9 w-9">
+                    <AvatarImage
+                      src={`https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(user.name)}`}
+                      alt={user.name}
+                    />
+                    <AvatarFallback className="bg-white/15 text-white text-xs">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="grid text-sm leading-tight">
+                    <span className="font-medium text-white">{user.name}</span>
+                    <span className="text-xs text-white/50">{user.email}</span>
+                  </div>
+                </div>
+
+                <Separator className=" bg-white/8" />
+
+                {/* Settings */}
+                <Link
+                  to="/dashboard/settings"
+                  className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/8 hover:text-white transition-colors"
+                >
+                  <Settings className="size-4" />
+                  <span>Settings</span>
+                </Link>
+
+                <Separator className=" bg-white/8" />
+
+                {/* Sign out */}
+                <Button
+                  onClick={async () => {
+                    await logoutFn()
+                    router.navigate({ to: '/login' })
+                  }}
+                  // className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-white/50 hover:bg-white/8 hover:text-white/80 transition-colors"
+                  className="rounded-md hover:text-white/80 cursor-pointer w-full text-white"
+                  variant="destructive"
+                >
+                  <LogOut className="size-4" />
+                  <span>Sign out</span>
+                </Button>
+              </PopoverContent>
+            </Popover>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

@@ -158,61 +158,80 @@ export function StepLearningSections() {
 
                   <div className="space-y-2">
                     {section.videos.map((video, vIdx) => (
-                      <div
-                        key={video.id}
-                        className="flex items-center gap-3 rounded-lg border border-white/8 bg-white/2 px-3 py-2.5"
-                      >
-                        <GripVertical className="h-3.5 w-3.5 shrink-0 text-white/15" />
-                        <span className="text-xs font-medium text-white/30 w-5">
-                          {vIdx + 1}.
-                        </span>
-                        <Input
-                          value={video.title}
-                          onChange={(e) =>
-                            updateVideo(section.id, video.id, {
-                              title: e.target.value,
-                            })
-                          }
-                          placeholder="Video title"
-                          className="h-7 flex-1 border-none bg-transparent"
-                        />
-                        <Input
-                          value={video.duration}
-                          onChange={(e) =>
-                            updateVideo(section.id, video.id, {
-                              duration: e.target.value,
-                            })
-                          }
-                          placeholder="0:00"
-                          className="h-7 w-16 text-center text-xs"
-                        />
-                        <label className="flex h-7 cursor-pointer items-center gap-1 rounded border border-white/12 bg-white/5 px-2 text-xs text-white/50 transition-colors hover:bg-white/8">
-                          <Upload className="h-3 w-3" />
-                          {video.file ? (
-                            <span className="max-w-20 truncate text-blue-400">
-                              {video.file.name}
-                            </span>
-                          ) : (
-                            'File'
-                          )}
-                          <input
-                            type="file"
-                            accept="video/*"
-                            className="hidden"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0] ?? null
-                              updateVideo(section.id, video.id, { file })
-                            }}
+                      <div key={video.id} className="space-y-1">
+                        <div className="flex items-center gap-3 rounded-lg border border-white/8 bg-white/2 px-3 py-2.5">
+                          <GripVertical className="h-3.5 w-3.5 shrink-0 text-white/15" />
+                          <span className="text-xs font-medium text-white/30 w-5">
+                            {vIdx + 1}.
+                          </span>
+                          <Input
+                            value={video.title}
+                            onChange={(e) =>
+                              updateVideo(section.id, video.id, {
+                                title: e.target.value,
+                              })
+                            }
+                            placeholder="Video title"
+                            className="h-7 flex-1 border-none bg-transparent"
                           />
-                        </label>
-                        <Button
-                          variant="ghost"
-                          size="icon-xs"
-                          onClick={() => removeVideo(section.id, video.id)}
-                          className="shrink-0 text-white/25 hover:text-red-400"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
+                          <Input
+                            value={video.duration}
+                            readOnly
+                            disabled
+                            placeholder="0:00"
+                            className="h-7 w-16 text-center text-xs"
+                          />
+                          <label className="flex h-7 cursor-pointer items-center gap-1 rounded border border-white/12 bg-white/5 px-2 text-xs text-white/50 transition-colors hover:bg-white/8">
+                            <Upload className="h-3 w-3" />
+                            {video.file ? (
+                              <span className="max-w-20 truncate text-blue-400">
+                                {video.file.name}
+                              </span>
+                            ) : (
+                              'File'
+                            )}
+                            <input
+                              type="file"
+                              accept="video/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0] ?? null
+                                updateVideo(section.id, video.id, { file })
+                                if (file) {
+                                  const videoEl =
+                                    document.createElement('video')
+                                  videoEl.preload = 'metadata'
+                                  videoEl.onloadedmetadata = () => {
+                                    const totalSeconds = Math.floor(
+                                      videoEl.duration,
+                                    )
+                                    const mins = Math.floor(totalSeconds / 60)
+                                    const secs = totalSeconds % 60
+                                    const formatted = `${mins}:${secs.toString().padStart(2, '0')}`
+                                    updateVideo(section.id, video.id, {
+                                      duration: formatted,
+                                    })
+                                    URL.revokeObjectURL(videoEl.src)
+                                  }
+                                  videoEl.src = URL.createObjectURL(file)
+                                }
+                              }}
+                            />
+                          </label>
+                          <Button
+                            variant="ghost"
+                            size="icon-xs"
+                            onClick={() => removeVideo(section.id, video.id)}
+                            className="shrink-0 text-white/25 hover:text-red-400"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        {errors[`sections.${sIdx}.videos.${vIdx}.title`] && (
+                          <p className="text-xs text-red-400 pl-10">
+                            {errors[`sections.${sIdx}.videos.${vIdx}.title`]}
+                          </p>
+                        )}
                       </div>
                     ))}
                   </div>

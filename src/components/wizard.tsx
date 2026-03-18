@@ -1,7 +1,22 @@
-import { Check } from 'lucide-react'
+import { Check, ChevronLeft, ChevronRight, Loader2, Save } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 export type WizardStep = {
   id: string
@@ -48,119 +63,176 @@ export function Wizard({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Step indicator */}
-      <nav aria-label="Progress">
-        <ol className="flex items-center">
-          {steps.map((step, index) => {
-            const isCompleted = index < currentStep
-            const isCurrent = index === currentStep
+      <Card className="bg-card/50 backdrop-blur-xl ring-white/12">
+        <CardContent>
+          <nav aria-label="Progress">
+            <ol className="flex items-center gap-0">
+              {steps.map((step, index) => {
+                const isCompleted = index < currentStep
+                const isCurrent = index === currentStep
+                const isClickable = index < currentStep
 
-            return (
-              <li
-                key={step.id}
-                className={cn(
-                  'relative flex items-center',
-                  index < steps.length - 1 && 'flex-1',
-                )}
-              >
-                <button
-                  type="button"
-                  onClick={() => index < currentStep && onStepChange(index)}
-                  disabled={index > currentStep}
-                  className="flex items-center gap-3 group"
-                >
-                  <span
+                return (
+                  <li
+                    key={step.id}
                     className={cn(
-                      'flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-medium transition-colors',
-                      isCompleted && 'border-blue-500 bg-blue-500 text-white',
-                      isCurrent &&
-                        'border-blue-400 bg-blue-500/20 text-blue-400',
-                      !isCompleted &&
-                        !isCurrent &&
-                        'border-white/20 text-white/30',
+                      'relative flex items-center',
+                      index < steps.length - 1 && 'flex-1',
                     )}
                   >
-                    {isCompleted ? <Check className="h-4 w-4" /> : index + 1}
-                  </span>
-                  <div className="hidden sm:block text-left">
-                    <p
-                      className={cn(
-                        'text-sm font-medium',
-                        isCurrent ? 'text-white' : 'text-white/40',
-                        isCompleted && 'text-white/70',
-                      )}
-                    >
-                      {step.title}
-                    </p>
-                    {step.description && (
-                      <p className="text-xs text-white/30">
-                        {step.description}
-                      </p>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            onClick={() => isClickable && onStepChange(index)}
+                            disabled={!isClickable && !isCurrent}
+                            className={cn(
+                              'flex items-center gap-3 rounded-lg px-2 py-1.5 transition-colors',
+                              isClickable && 'cursor-pointer hover:bg-white/5',
+                              !isClickable && !isCurrent && 'cursor-default',
+                            )}
+                          >
+                            <span
+                              className={cn(
+                                'flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-medium transition-all',
+                                isCompleted &&
+                                  'border-primary bg-primary text-primary-foreground',
+                                isCurrent &&
+                                  'border-primary bg-primary/20 text-primary ring-[3px] ring-primary/25',
+                                !isCompleted &&
+                                  !isCurrent &&
+                                  'border-border text-muted-foreground',
+                              )}
+                            >
+                              {isCompleted ? (
+                                <Check className="h-4 w-4" />
+                              ) : (
+                                index + 1
+                              )}
+                            </span>
+                            <div className="hidden sm:block text-left">
+                              <p
+                                className={cn(
+                                  'text-sm font-medium leading-tight',
+                                  isCurrent && 'text-foreground',
+                                  isCompleted && 'text-muted-foreground',
+                                  !isCompleted &&
+                                    !isCurrent &&
+                                    'text-muted-foreground/50',
+                                )}
+                              >
+                                {step.title}
+                              </p>
+                            </div>
+                          </button>
+                        </TooltipTrigger>
+                        {step.description && (
+                          <TooltipContent side="bottom">
+                            {step.description}
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    {/* Connector */}
+                    {index < steps.length - 1 && (
+                      <div className="mx-2 hidden flex-1 sm:block">
+                        <Separator
+                          className={cn(
+                            'transition-colors',
+                            isCompleted ? 'bg-primary' : 'bg-border',
+                          )}
+                        />
+                      </div>
                     )}
-                  </div>
-                </button>
-
-                {/* Connector line */}
-                {index < steps.length - 1 && (
-                  <div className="mx-4 hidden flex-1 sm:block">
-                    <div
-                      className={cn(
-                        'h-px w-full',
-                        isCompleted ? 'bg-blue-500' : 'bg-white/12',
-                      )}
-                    />
-                  </div>
-                )}
-              </li>
-            )
-          })}
-        </ol>
-      </nav>
-
-      {/* Step content */}
-      <Card className="bg-white/5 backdrop-blur-xl ring-white/12">
-        <CardContent>{children}</CardContent>
+                  </li>
+                )
+              })}
+            </ol>
+          </nav>
+        </CardContent>
       </Card>
 
-      {/* Navigation buttons */}
-      <div className="flex items-center justify-between">
-        {onSaveDraft ? (
-          <Button
-            variant="outline"
-            onClick={onSaveDraft}
-            disabled={isSaving || isSubmitting}
-          >
-            {isSaving ? 'Saving...' : 'Save as Draft'}
-          </Button>
-        ) : (
-          <div />
-        )}
-
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            onClick={() => onStepChange(currentStep - 1)}
-            disabled={isFirst}
-            className={cn(isFirst && 'invisible')}
-          >
-            Back
-          </Button>
-
-          {isLast ? (
+      {/* Step content */}
+      <Card className="bg-card/50 backdrop-blur-xl ring-white/12">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-foreground">
+                {steps[currentStep]?.title}
+              </CardTitle>
+              <Badge variant="secondary" className="text-[10px]">
+                Step {currentStep + 1} of {steps.length}
+              </Badge>
+            </div>
+          </div>
+          {steps[currentStep]?.description && (
+            <CardDescription>{steps[currentStep].description}</CardDescription>
+          )}
+        </CardHeader>
+        <Separator className="bg-border/50" />
+        <CardContent>{children}</CardContent>
+        <Separator className="bg-border/50" />
+        <CardFooter className="justify-between">
+          {onSaveDraft ? (
             <Button
-              onClick={handleFinish}
-              disabled={!canProceed || isSubmitting}
+              variant="outline"
+              size="sm"
+              onClick={onSaveDraft}
+              disabled={isSaving || isSubmitting}
             >
-              {isSubmitting ? 'Publishing...' : 'Publish Content'}
+              {isSaving ? (
+                <Loader2
+                  className="h-4 w-4 animate-spin"
+                  data-icon="inline-start"
+                />
+              ) : (
+                <Save className="h-4 w-4" data-icon="inline-start" />
+              )}
+              {isSaving ? 'Saving...' : 'Save Draft'}
             </Button>
           ) : (
-            <Button onClick={handleNext} disabled={!canProceed}>
-              Continue
-            </Button>
+            <div />
           )}
-        </div>
-      </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onStepChange(currentStep - 1)}
+              disabled={isFirst}
+              className={cn(isFirst && 'invisible')}
+            >
+              <ChevronLeft className="h-4 w-4" data-icon="inline-start" />
+              Back
+            </Button>
+
+            {isLast ? (
+              <Button
+                size="sm"
+                onClick={handleFinish}
+                disabled={!canProceed || isSubmitting}
+              >
+                {isSubmitting ? (
+                  <Loader2
+                    className="h-4 w-4 animate-spin"
+                    data-icon="inline-start"
+                  />
+                ) : null}
+                {isSubmitting ? 'Submitting...' : 'Submit for Approval'}
+              </Button>
+            ) : (
+              <Button size="sm" onClick={handleNext} disabled={!canProceed}>
+                Continue
+                <ChevronRight className="h-4 w-4" data-icon="inline-end" />
+              </Button>
+            )}
+          </div>
+        </CardFooter>
+      </Card>
     </div>
   )
 }

@@ -51,7 +51,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             },
           ]}
         />
-        <ReactQueryDevtools buttonPosition="bottom-left" />
+        <ReactQueryDevtools buttonPosition="top-right" />
         <Scripts />
         <Toaster />
       </body>
