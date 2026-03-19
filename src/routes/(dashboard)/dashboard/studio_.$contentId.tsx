@@ -8,7 +8,6 @@ import {
   ChevronDown,
   ChevronUp,
   Play,
-  Clock,
   Calendar,
   Tag,
   Layers,
@@ -17,15 +16,20 @@ import {
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { fetchContentDetail, type ContentDetail } from '@/lib/dummy-data'
 import { Badge } from '@/components/ui/badge'
+import { contentApi } from '@/lib/api'
+import { ContentStatus } from '@/lib/types'
+import { getContentStatusLabel } from '@/hooks/use-studio'
 
 // ─── Route ──────────────────────────────────────────────────────────────
 
 export const Route = createFileRoute(
   '/(dashboard)/dashboard/studio_/$contentId',
 )({
-  loader: ({ params }) => fetchContentDetail(Number(params.contentId)),
+  loader: async ({ params }) => {
+    const result = await contentApi.getById(params.contentId)
+    return result.data
+  },
   component: ContentDetailPage,
   validateSearch: (search: Record<string, unknown>) => ({
     view: (search.view === 'list' ? 'list' : 'grid') as 'grid' | 'list',
@@ -36,21 +40,21 @@ export const Route = createFileRoute(
 
 // ─── Status styles ──────────────────────────────────────────────────────
 
-const STATUS_STYLES: Record<ContentDetail['status'], string> = {
+const STATUS_STYLES: Record<string, string> = {
   draft: 'bg-yellow-500/15 text-yellow-400',
-  'in-progress': 'bg-blue-500/15 text-blue-400',
   published: 'bg-green-500/15 text-green-400',
+  archived: 'bg-gray-500/15 text-gray-400',
 }
 
 // ─── Page Component ─────────────────────────────────────────────────────
 
 function ContentDetailPage() {
-  const content = Route.useLoaderData()
+  const { content } = Route.useLoaderData()
   const navigate = useNavigate()
   const { view, page, q } = Route.useSearch()
+  const sections = content?.sections ?? []
   const [openSections, setOpenSections] = useState<Set<string>>(() => {
-    if (!content) return new Set()
-    return new Set(content.sections.map((s) => s.id))
+    return new Set(sections.map((s) => s.id))
   })
 
   if (!content) {
@@ -73,8 +77,10 @@ function ContentDetailPage() {
     )
   }
 
-  const totalVideos = content.sections.reduce(
-    (sum, s) => sum + s.videos.length,
+  const statusLabel = getContentStatusLabel(content.status)
+
+  const totalVideos = sections.reduce(
+    (sum, s) => sum + (s.medias?.length ?? 0),
     0,
   )
 
@@ -87,11 +93,20 @@ function ContentDetailPage() {
     })
   }
 
-  const handleTogglePublish = () => {
-    if (content.status === 'published') {
-      toast.success(`"${content.title}" has been unpublished`)
-    } else {
-      toast.success(`"${content.title}" has been published`)
+  const handleTogglePublish = async () => {
+    try {
+      const newStatus =
+        content.status === ContentStatus.PUBLISHED
+          ? ContentStatus.DRAFT
+          : ContentStatus.PUBLISHED
+      await contentApi.update(content.id, { status: newStatus })
+      if (newStatus === ContentStatus.PUBLISHED) {
+        toast.success(`"${content.title}" has been published`)
+      } else {
+        toast.success(`"${content.title}" has been unpublished`)
+      }
+    } catch {
+      toast.error('Failed to update content status')
     }
   }
 
@@ -121,12 +136,12 @@ function ContentDetailPage() {
               {content.title}
             </h1>
             <Badge
-              className={`shrink-0 text-[12px] capitalize py-3 ${STATUS_STYLES[content.status]}`}
+              className={`shrink-0 text-[12px] capitalize py-3 ${STATUS_STYLES[statusLabel] ?? STATUS_STYLES.draft}`}
             >
-              {content.status}
+              {statusLabel}
             </Badge>
           </div>
-          <p className="mt-0.5 text-sm text-white/50">{content.description}</p>
+          <p className="mt-0.5 text-sm text-white/50">{content.body}</p>
         </div>
       </div>
 
@@ -137,7 +152,7 @@ function ContentDetailPage() {
           Edit
         </Button>
         <Button size="sm" variant="outline" onClick={handleTogglePublish}>
-          {content.status === 'published' ? (
+          {content.status === ContentStatus.PUBLISHED ? (
             <>
               <EyeOff className="h-3.5 w-3.5" />
               Unpublish
@@ -156,29 +171,34 @@ function ContentDetailPage() {
         {/* Left: Thumbnail & meta */}
         <div className="space-y-4">
           <Card className="bg-white/5 backdrop-blur-xl ring-white/12 overflow-hidden">
-            <img
-              src={content.thumbnail}
-              alt={content.title}
-              className="h-48 w-full object-cover"
-            />
+            {content.thumbnailUrl ? (
+              <img
+                src={content.thumbnailUrl}
+                alt={content.title}
+                className="h-48 w-full object-cover"
+              />
+            ) : (
+              <div className="h-48 w-full bg-white/5" />
+            )}
             <CardContent className="space-y-3">
               <div className="flex items-center gap-2 text-sm text-white/60">
-                <Clock className="h-3.5 w-3.5" />
-                <span>{content.duration}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-white/60">
                 <Calendar className="h-3.5 w-3.5" />
-                <span>Created {content.createdAt}</span>
+                <span>
+                  Created{' '}
+                  {new Date(content.createdAt).toLocaleDateString()}
+                </span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-white/60">
-                <Tag className="h-3.5 w-3.5" />
-                <span className="capitalize">{content.category}</span>
-              </div>
+              {content.year && (
+                <div className="flex items-center gap-2 text-sm text-white/60">
+                  <Tag className="h-3.5 w-3.5" />
+                  <span>{content.year}</span>
+                </div>
+              )}
               <div className="flex items-center gap-2 text-sm text-white/60">
                 <Layers className="h-3.5 w-3.5" />
                 <span>
-                  {content.sections.length}{' '}
-                  {content.sections.length === 1 ? 'section' : 'sections'}
+                  {sections.length}{' '}
+                  {sections.length === 1 ? 'section' : 'sections'}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm text-white/60">
@@ -198,13 +218,13 @@ function ContentDetailPage() {
               Learning Sections
             </h2>
             <span className="text-xs text-white/30">
-              {content.sections.length}{' '}
-              {content.sections.length === 1 ? 'section' : 'sections'} &middot;{' '}
+              {sections.length}{' '}
+              {sections.length === 1 ? 'section' : 'sections'} &middot;{' '}
               {totalVideos} {totalVideos === 1 ? 'video' : 'videos'}
             </span>
           </div>
 
-          {content.sections.length === 0 && (
+          {sections.length === 0 && (
             <Card className="bg-white/5 backdrop-blur-xl ring-white/12">
               <CardContent>
                 <p className="py-8 text-center text-sm text-white/40">
@@ -215,8 +235,9 @@ function ContentDetailPage() {
           )}
 
           <div className="space-y-3">
-            {content.sections.map((section, sIdx) => {
+            {sections.map((section, sIdx) => {
               const isOpen = openSections.has(section.id)
+              const medias = section.medias ?? []
 
               return (
                 <div
@@ -243,8 +264,8 @@ function ContentDetailPage() {
                       )}
                     </div>
                     <span className="text-xs text-white/30">
-                      {section.videos.length}{' '}
-                      {section.videos.length === 1 ? 'video' : 'videos'}
+                      {medias.length}{' '}
+                      {medias.length === 1 ? 'video' : 'videos'}
                     </span>
                     {isOpen ? (
                       <ChevronUp className="h-4 w-4 text-white/30" />
@@ -256,9 +277,9 @@ function ContentDetailPage() {
                   {/* Videos list */}
                   {isOpen && (
                     <div className="divide-y divide-white/6">
-                      {section.videos.map((video, vIdx) => (
+                      {medias.map((m, vIdx) => (
                         <div
-                          key={video.id}
+                          key={m.id}
                           className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-white/3"
                         >
                           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/8">
@@ -268,10 +289,10 @@ function ContentDetailPage() {
                             {vIdx + 1}.
                           </span>
                           <span className="flex-1 text-sm text-white/70">
-                            {video.title}
+                            {m.title ?? m.fileName}
                           </span>
                           <span className="text-xs text-white/30">
-                            {video.duration}
+                            {m.hlsUrl ? 'Ready' : 'Processing'}
                           </span>
                         </div>
                       ))}

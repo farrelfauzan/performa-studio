@@ -72,34 +72,34 @@ export const DASHBOARD_ACTIVITY: ActivityItem[] = [
 ]
 
 export const MOST_WATCHED_VIDEOS: MostWatchedVideo[] = [
-  {
-    id: 1,
-    title: 'How to Build a Design System',
-    thumbnail: 'https://picsum.photos/seed/mw1/400/225',
-    views: 45200,
-    duration: '12:34',
-  },
-  {
-    id: 2,
-    title: 'Advanced React Patterns 2026',
-    thumbnail: 'https://picsum.photos/seed/mw2/400/225',
-    views: 38700,
-    duration: '18:22',
-  },
-  {
-    id: 3,
-    title: 'UI Animation Masterclass',
-    thumbnail: 'https://picsum.photos/seed/mw3/400/225',
-    views: 31500,
-    duration: '24:15',
-  },
-  {
-    id: 4,
-    title: 'TypeScript Tips & Tricks',
-    thumbnail: 'https://picsum.photos/seed/mw4/400/225',
-    views: 28900,
-    duration: '9:45',
-  },
+  // {
+  //   id: 1,
+  //   title: 'How to Build a Design System',
+  //   thumbnail: 'https://picsum.photos/seed/mw1/400/225',
+  //   views: 45200,
+  //   duration: '12:34',
+  // },
+  // {
+  //   id: 2,
+  //   title: 'Advanced React Patterns 2026',
+  //   thumbnail: 'https://picsum.photos/seed/mw2/400/225',
+  //   views: 38700,
+  //   duration: '18:22',
+  // },
+  // {
+  //   id: 3,
+  //   title: 'UI Animation Masterclass',
+  //   thumbnail: 'https://picsum.photos/seed/mw3/400/225',
+  //   views: 31500,
+  //   duration: '24:15',
+  // },
+  // {
+  //   id: 4,
+  //   title: 'TypeScript Tips & Tricks',
+  //   thumbnail: 'https://picsum.photos/seed/mw4/400/225',
+  //   views: 28900,
+  //   duration: '9:45',
+  // },
 ]
 
 // ─── Studio data ────────────────────────────────────────────────────────

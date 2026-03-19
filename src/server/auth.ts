@@ -1,29 +1,10 @@
 import { createServerFn } from '@tanstack/react-start'
-import {
-  getCookie,
-  setCookie,
-  deleteCookie,
-} from '@tanstack/react-start/server'
+import { setCookie, deleteCookie } from '@tanstack/react-start/server'
 import { redirect } from '@tanstack/react-router'
 import { z } from 'zod'
+import { authMiddleware } from './middleware'
 
-// ─── Dummy user database ────────────────────────────────────────────────
-const DUMMY_USERS = [
-  {
-    id: '1',
-    email: 'admin@performa.io',
-    password: 'admin123',
-    name: 'Admin User',
-    role: 'admin',
-  },
-  {
-    id: '2',
-    email: 'user@performa.io',
-    password: 'user123',
-    name: 'John Doe',
-    role: 'user',
-  },
-] as const
+const API_URL = process.env.VITE_API_URL || 'http://localhost:3000/api'
 
 // ─── Types ──────────────────────────────────────────────────────────────
 export type SessionUser = {
@@ -33,26 +14,46 @@ export type SessionUser = {
   role: string
 }
 
-// ─── Session helpers (cookie-based, server-only) ────────────────────────
-function getSessionFromCookie(): SessionUser | null {
-  const raw = getCookie('session')
-  if (!raw) return null
-  try {
-    return JSON.parse(raw) as SessionUser
-  } catch {
-    return null
-  }
-}
-
 // ─── Server Functions ───────────────────────────────────────────────────
 
-/** Get the current session (returns user or null) */
-export const getSession = createServerFn({ method: 'GET' }).handler(
-  async () => {
-    const user = getSessionFromCookie()
-    return user
-  },
-)
+/** Get the current session by validating token against backend */
+export const getSession = createServerFn({ method: 'GET' })
+  .middleware([authMiddleware])
+  .handler(async ({ context }) => {
+    const token = context.accessToken
+
+    if (!token) return null
+
+    try {
+      const res = await fetch(`${API_URL}/v1/auth/getMe`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+
+      if (!res.ok) return null
+
+      const json = (await res.json()) as {
+        data: {
+          id: string
+          username: string
+          email: string
+          roles: { id: string; name: string; permissions: string[] }[]
+          fullName: string | null
+        }
+      }
+
+      const profile = json.data
+      const sessionUser: SessionUser = {
+        id: profile.id,
+        email: profile.email,
+        name: profile.fullName || profile.username,
+        role: profile.roles?.[0]?.name ?? 'user',
+      }
+
+      return sessionUser
+    } catch {
+      return null
+    }
+  })
 
 /** Login with email + password */
 export const loginFn = createServerFn({ method: 'POST' })
@@ -63,51 +64,134 @@ export const loginFn = createServerFn({ method: 'POST' })
     }),
   )
   .handler(async ({ data }) => {
-    // Simulate network delay
-    await new Promise((r) => setTimeout(r, 500))
+    try {
+      const res = await fetch(`${API_URL}/v1/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          usernameOrEmail: data.email,
+          password: data.password,
+        }),
+      })
 
-    const user = DUMMY_USERS.find(
-      (u) => u.email === data.email && u.password === data.password,
-    )
+      if (!res.ok) {
+        const error = await res.json().catch(() => null)
+        return {
+          error:
+            (error as { message?: string })?.message ||
+            'Invalid email or password',
+          user: null,
+          accessToken: null,
+        }
+      }
 
-    if (!user) {
+      const json = (await res.json()) as {
+        data: {
+          accessToken: string
+          refreshToken: string
+          user?: { id: string; username: string; email: string }
+        }
+      }
+
+      const { accessToken, refreshToken, user: loginUser } = json.data
+
+      // Store tokens in httpOnly cookies (7 days)
+      const cookieOpts = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax' as const,
+        maxAge: 60 * 60 * 24 * 7,
+        path: '/',
+      }
+
+      setCookie('accessToken', accessToken, cookieOpts)
+      setCookie('refreshToken', refreshToken, cookieOpts)
+
+      // Fetch full profile
+      const profileRes = await fetch(`${API_URL}/v1/auth/getMe`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+
+      let sessionUser: SessionUser
+      if (profileRes.ok) {
+        const profileJson = (await profileRes.json()) as {
+          data: {
+            id: string
+            username: string
+            email: string
+            roles: { id: string; name: string; permissions: string[] }[]
+            fullName: string | null
+          }
+        }
+        const profile = profileJson.data
+        sessionUser = {
+          id: profile.id,
+          email: profile.email,
+          name: profile.fullName || profile.username,
+          role: profile.roles?.[0]?.name ?? 'user',
+        }
+      } else {
+        sessionUser = {
+          id: loginUser?.id ?? '',
+          email: loginUser?.email ?? data.email,
+          name: loginUser?.username ?? data.email,
+          role: 'user',
+        }
+      }
+
+      return { error: null, user: sessionUser, accessToken }
+    } catch {
       return {
-        error: 'Invalid email or password',
+        error: 'An error occurred during login. Please try again.',
         user: null,
+        accessToken: null,
       }
     }
-
-    const sessionUser: SessionUser = {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      role: user.role,
-    }
-
-    // Set session cookie (7 days)
-    setCookie('session', JSON.stringify(sessionUser), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7,
-      path: '/',
-    })
-
-    return { error: null, user: sessionUser }
   })
 
-/** Logout — clear session cookie */
+/** Logout — clear session cookies */
 export const logoutFn = createServerFn({ method: 'POST' }).handler(async () => {
-  deleteCookie('session')
+  deleteCookie('accessToken')
+  deleteCookie('refreshToken')
 })
 
 /** Guard: require auth or redirect to login */
-export const requireAuth = createServerFn({ method: 'GET' }).handler(
-  async () => {
-    const user = getSessionFromCookie()
-    if (!user) {
+export const requireAuth = createServerFn({ method: 'GET' })
+  .middleware([authMiddleware])
+  .handler(async ({ context }) => {
+    const token = context.accessToken
+    if (!token) {
       throw redirect({ to: '/login' })
     }
-    return user
-  },
-)
+
+    try {
+      const res = await fetch(`${API_URL}/v1/auth/getMe`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+
+      if (!res.ok) {
+        throw redirect({ to: '/login' })
+      }
+
+      const json = (await res.json()) as {
+        data: {
+          id: string
+          username: string
+          email: string
+          roles: { id: string; name: string; permissions: string[] }[]
+          fullName: string | null
+        }
+      }
+
+      const profile = json.data
+      return {
+        id: profile.id,
+        email: profile.email,
+        name: profile.fullName || profile.username,
+        role: profile.roles?.[0]?.name ?? 'user',
+      } satisfies SessionUser
+    } catch (e) {
+      if (e && typeof e === 'object' && 'to' in e) throw e // re-throw redirect
+      throw redirect({ to: '/login' })
+    }
+  })

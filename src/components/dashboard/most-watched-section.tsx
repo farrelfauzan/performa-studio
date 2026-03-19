@@ -52,33 +52,42 @@ export function MostWatchedSection() {
         <CardTitle className="text-sm font-medium">Most Watched</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        {data.map((video) => (
-          <Link
-            key={video.id}
-            to="/dashboard/studio/$contentId"
-            params={{ contentId: String(video.id) }}
-            search={{} as any}
-            className="-m-1.5 flex items-center gap-3 rounded-lg p-1.5 transition-colors hover:bg-muted/50"
-          >
-            <div className="relative h-12 w-20 shrink-0 overflow-hidden rounded-lg">
-              <img
-                src={video.thumbnail}
-                alt={video.title}
-                className="h-full w-full object-cover"
-              />
-              <span className="absolute bottom-0.5 right-0.5 rounded bg-black/70 px-1 text-[10px] text-white/80">
-                {video.duration}
-              </span>
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium">{video.title}</p>
-              <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Eye className="size-3" />
-                {formatViews(video.views)} views
-              </p>
-            </div>
-          </Link>
-        ))}
+        {data.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-6 text-center">
+            <Eye className="size-8 text-muted-foreground/40 mb-2" />
+            <p className="text-sm text-muted-foreground">
+              No watched videos yet
+            </p>
+          </div>
+        ) : (
+          data.map((video) => (
+            <Link
+              key={video.id}
+              to="/dashboard/studio/$contentId"
+              params={{ contentId: String(video.id) }}
+              search={{} as any}
+              className="-m-1.5 flex items-center gap-3 rounded-lg p-1.5 transition-colors hover:bg-muted/50"
+            >
+              <div className="relative h-12 w-20 shrink-0 overflow-hidden rounded-lg">
+                <img
+                  src={video.thumbnail}
+                  alt={video.title}
+                  className="h-full w-full object-cover"
+                />
+                <span className="absolute bottom-0.5 right-0.5 rounded bg-black/70 px-1 text-[10px] text-white/80">
+                  {video.duration}
+                </span>
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">{video.title}</p>
+                <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Eye className="size-3" />
+                  {formatViews(video.views)} views
+                </p>
+              </div>
+            </Link>
+          ))
+        )}
       </CardContent>
     </Card>
   )

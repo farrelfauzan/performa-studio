@@ -8,6 +8,7 @@ import { StepGeneralDetails } from '@/components/studio/step-general-details'
 import { StepUploadMedia } from '@/components/studio/step-upload-media'
 import { StepLearningSections } from '@/components/studio/step-learning-sections'
 import { StepFinalization } from '@/components/studio/step-finalization'
+import { useContentCreation } from '@/hooks/use-content-creation'
 import { useEffect } from 'react'
 
 // ─── Wizard Steps Config ────────────────────────────────────────────────
@@ -56,6 +57,7 @@ function CreateContentPage() {
     clearErrors,
     reset,
   } = useStudioStore()
+  const { createAndUpload, saveDraft } = useContentCreation()
 
   // Reset store when unmounting
   useEffect(() => {
@@ -79,20 +81,38 @@ function CreateContentPage() {
 
   const handleSaveDraft = async () => {
     setSaving(true)
-    await new Promise((r) => setTimeout(r, 1000))
-    toast.success('Draft saved successfully!')
-    setSaving(false)
+    try {
+      await saveDraft()
+      toast.success('Draft saved successfully!')
+      navigate({
+        to: '/dashboard/studio',
+        search: { view: 'grid', page: 0, q: '' },
+      })
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : 'Failed to save draft',
+      )
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleFinish = async () => {
     setSubmitting(true)
-    await new Promise((r) => setTimeout(r, 1500))
-    toast.success('Content submitted for approval!')
-    setSubmitting(false)
-    navigate({
-      to: '/dashboard/studio',
-      search: { view: 'grid', page: 0, q: '' },
-    })
+    try {
+      await createAndUpload()
+      toast.success('Content created successfully! Videos are being processed.')
+      navigate({
+        to: '/dashboard/studio',
+        search: { view: 'grid', page: 0, q: '' },
+      })
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : 'Failed to create content',
+      )
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (

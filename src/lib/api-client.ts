@@ -66,7 +66,7 @@ export const apiClient: TypedAxiosInstance = axios.create(axiosConfig)
 // Request interceptor
 apiClient.interceptors.request.use(
   (reqConfig: InternalAxiosRequestConfig) => {
-    const token = useAuthStore.getState().token
+    const token = useAuthStore.getState().accessToken
 
     if (token && reqConfig.headers) {
       reqConfig.headers.Authorization = `Bearer ${token}`

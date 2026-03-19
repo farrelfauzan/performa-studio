@@ -22,6 +22,8 @@ type PerformaGridProps<T> = {
     lg?: number
   }
   emptyMessage?: string
+  /** Total items for server-side pagination. When set, client-side filtering/pagination is skipped. */
+  totalItems?: number
 }
 
 export function PerformaGrid<T>({
@@ -41,6 +43,7 @@ export function PerformaGrid<T>({
   skeletonCount = 6,
   columns = { sm: 2, lg: 3 },
   emptyMessage = 'No results found',
+  totalItems,
 }: PerformaGridProps<T>) {
   const [internalSearch, setInternalSearch] = useState('')
   const [internalPage, setInternalPage] = useState(0)
@@ -56,18 +59,21 @@ export function PerformaGrid<T>({
     onPageChange ? onPageChange(next) : setInternalPage(next)
   }
 
+  const isServerPaginated = totalItems !== undefined
+
   const filtered = useMemo(() => {
+    if (isServerPaginated) return data
     if (!search.trim() || !getSearchValue) return data
     const q = search.toLowerCase()
     return data.filter((item) => getSearchValue(item).toLowerCase().includes(q))
-  }, [data, search, getSearchValue])
+  }, [data, search, getSearchValue, isServerPaginated])
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
+  const totalCount = isServerPaginated ? totalItems : filtered.length
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
   const effectivePage = Math.min(page, totalPages - 1)
-  const paginated = filtered.slice(
-    effectivePage * pageSize,
-    (effectivePage + 1) * pageSize,
-  )
+  const paginated = isServerPaginated
+    ? data
+    : filtered.slice(effectivePage * pageSize, (effectivePage + 1) * pageSize)
 
   const handleSearch = (value: string) => {
     setSearch(value)
@@ -135,12 +141,12 @@ export function PerformaGrid<T>({
       )}
 
       {/* Pagination */}
-      {!isLoading && filtered.length > pageSize && (
+      {!isLoading && totalCount > pageSize && (
         <div className="flex items-center justify-between text-xs text-white/40">
           <span>
             Showing {effectivePage * pageSize + 1}–
-            {Math.min((effectivePage + 1) * pageSize, filtered.length)} of{' '}
-            {filtered.length}
+            {Math.min((effectivePage + 1) * pageSize, totalCount)} of{' '}
+            {totalCount}
           </span>
           <div className="flex items-center gap-1">
             <button

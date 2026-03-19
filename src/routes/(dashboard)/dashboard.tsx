@@ -21,9 +21,8 @@ export const Route = createFileRoute('/(dashboard)/dashboard')({
     }
     return { user }
   },
-  loader: async () => {
-    const user = await getSession()
-    return { user: user! }
+  loader: async ({ context }) => {
+    return { user: context.user }
   },
 })
 

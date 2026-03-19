@@ -225,7 +225,7 @@ export const useStudioStore = create<StudioFormState & StudioFormActions>(
       }
 
       const result = schema.safeParse(stepData[step])
-      console.log('Validation result for step', step, result)
+
       if (result.success) {
         set({ errors: {} })
         return true

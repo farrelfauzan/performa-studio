@@ -9,6 +9,7 @@ import {
   ChevronsUpDown,
 } from 'lucide-react'
 import { logoutFn } from '@/server/auth'
+import { useAuthStore } from '@/stores/auth-store'
 import {
   Sidebar,
   SidebarContent,
@@ -198,6 +199,7 @@ export function DashboardSidebar({ user: userProp }: { user: SessionUser }) {
                 <Button
                   onClick={async () => {
                     await logoutFn()
+                    useAuthStore.getState().logout()
                     router.navigate({ to: '/login' })
                   }}
                   // className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-white/50 hover:bg-white/8 hover:text-white/80 transition-colors"

@@ -1,20 +1,41 @@
 import { useApiQuery } from '@/hooks/use-api'
-import type { StudioProject } from '@/lib/dummy-data'
-import { STUDIO_PROJECTS } from '@/lib/dummy-data'
-
-// TODO: Replace with real API calls via apiClient
-// import apiClient from '@/lib/api-client'
+import { contentApi } from '@/lib/api'
+import type { Content, PageMeta, ContentStatus } from '@/lib/types'
 
 type StudioData = {
-  projects: StudioProject[]
+  projects: Content[]
+  meta?: PageMeta
 }
 
-async function getStudioData(): Promise<StudioData> {
-  // TODO: return apiClient.get<StudioData>('/studio/projects')
-  await new Promise((resolve) => setTimeout(resolve, 1000))
-  return { projects: STUDIO_PROJECTS }
+export function useStudioProjects(params?: {
+  page?: number
+  pageSize?: number
+  search?: string
+}) {
+  return useApiQuery<StudioData>(
+    ['studio-projects', params?.page, params?.pageSize, params?.search],
+    async () => {
+      const result = await contentApi.getAll({
+        page: (params?.page ?? 0) + 1,
+        pageSize: params?.pageSize ?? 12,
+        search: params?.search || undefined,
+      })
+      return {
+        projects: result.data,
+        meta: result.meta,
+      }
+    },
+  )
 }
 
-export function useStudioProjects() {
-  return useApiQuery('studio-projects', getStudioData)
+// ─── Helpers ─────────────────────────────────────────────────────────────
+
+const STATUS_MAP: Record<ContentStatus, string> = {
+  0: 'draft',
+  1: 'published',
+  2: 'archived',
+}
+
+export function getContentStatusLabel(status: ContentStatus): string {
+  return STATUS_MAP[status] ?? 'draft'
 }

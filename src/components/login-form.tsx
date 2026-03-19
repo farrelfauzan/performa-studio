@@ -8,6 +8,7 @@ import { useRouter } from '@tanstack/react-router'
 import { validateWithZod } from '@/lib/utils'
 import { loginFn } from '@/server/auth'
 import { useState } from 'react'
+import { useAuthStore } from '@/stores/auth-store'
 
 const emailSchema = z.email({
   error: 'Invalid email address',
@@ -19,6 +20,7 @@ const passwordSchema = z
 export function LoginForm() {
   const router = useRouter()
   const [serverError, setServerError] = useState<string | null>(null)
+  const { setAuth } = useAuthStore()
 
   const form = useForm({
     defaultValues: {
@@ -34,7 +36,11 @@ export function LoginForm() {
         return
       }
 
-      router.navigate({ to: '/dashboard' })
+      if (result.user && result.accessToken) {
+        setAuth(result.accessToken, result.user)
+        router.navigate({ to: '/dashboard' })
+      }
+
     },
   })
 

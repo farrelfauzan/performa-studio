@@ -1,31 +1,35 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { LayoutGrid, List, Plus } from 'lucide-react'
-import { useStudioProjects } from '@/hooks/use-studio'
+import { useStudioProjects, getContentStatusLabel } from '@/hooks/use-studio'
 import { PerformaTable, type Column } from '@/components/performa-table'
 import { PerformaGrid } from '@/components/performa-grid'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import type { StudioProject } from '@/lib/dummy-data'
+import type { Content } from '@/lib/types'
 
 type ViewMode = 'grid' | 'list'
 
-const STATUS_STYLES: Record<StudioProject['status'], string> = {
+const STATUS_STYLES: Record<string, string> = {
   draft: 'bg-yellow-500/15 text-yellow-400 border-transparent',
-  'in-progress': 'bg-blue-500/15 text-blue-400 border-transparent',
   published: 'bg-green-500/15 text-green-400 border-transparent',
+  archived: 'bg-gray-500/15 text-gray-400 border-transparent',
 }
 
-const studioColumns: Column<StudioProject>[] = [
+const studioColumns: Column<Content>[] = [
   {
     key: 'title',
     header: 'Project',
     render: (p) => (
       <div className="flex items-center gap-3">
-        <img
-          src={p.thumbnail}
-          alt={p.title}
-          className="h-8 w-8 shrink-0 rounded object-cover"
-        />
+        {p.thumbnailUrl ? (
+          <img
+            src={p.thumbnailUrl}
+            alt={p.title}
+            className="h-8 w-8 shrink-0 rounded object-cover"
+          />
+        ) : (
+          <div className="h-8 w-8 shrink-0 rounded bg-white/10" />
+        )}
         <span className="text-sm font-medium text-white/90">{p.title}</span>
       </div>
     ),
@@ -33,23 +37,32 @@ const studioColumns: Column<StudioProject>[] = [
   {
     key: 'status',
     header: 'Status',
-    render: (p) => (
-      <Badge
-        className={`text-[12px] capitalize py-3 ${STATUS_STYLES[p.status]}`}
-      >
-        {p.status}
-      </Badge>
-    ),
+    render: (p) => {
+      const label = getContentStatusLabel(p.status)
+      return (
+        <Badge
+          className={`text-[12px] capitalize py-3 ${STATUS_STYLES[label] ?? STATUS_STYLES.draft}`}
+        >
+          {label}
+        </Badge>
+      )
+    },
   },
   {
-    key: 'duration',
-    header: 'Duration',
-    render: (p) => <span className="text-sm text-white/60">{p.duration}</span>,
+    key: 'year',
+    header: 'Year',
+    render: (p) => (
+      <span className="text-sm text-white/60">{p.year ?? '—'}</span>
+    ),
   },
   {
     key: 'updatedAt',
     header: 'Updated',
-    render: (p) => <span className="text-sm text-white/40">{p.updatedAt}</span>,
+    render: (p) => (
+      <span className="text-sm text-white/40">
+        {new Date(p.updatedAt).toLocaleDateString()}
+      </span>
+    ),
   },
 ]
 
@@ -63,8 +76,12 @@ export const Route = createFileRoute('/(dashboard)/dashboard/studio')({
 })
 
 function StudioPage() {
-  const { data: projects, isLoading } = useStudioProjects()
   const { view, page, q } = Route.useSearch()
+  const { data, isLoading } = useStudioProjects({
+    page,
+    pageSize: view === 'grid' ? 9 : 10,
+    search: q || undefined,
+  })
   const navigate = useNavigate()
   const routeNavigate = Route.useNavigate()
 
@@ -84,15 +101,15 @@ function StudioPage() {
 
   const setSearch = (search: string) => {
     routeNavigate({
-      search: (prev) => ({ ...prev, q: search }),
+      search: (prev) => ({ ...prev, q: search, page: 0 }),
       replace: true,
     })
   }
 
-  const openDetail = (project: StudioProject) => {
+  const openDetail = (project: Content) => {
     navigate({
       to: '/dashboard/studio/$contentId',
-      params: { contentId: String(project.id) },
+      params: { contentId: project.id },
       search: { view, page, q },
     })
   }
@@ -139,7 +156,7 @@ function StudioPage() {
       {/* Projects */}
       {view === 'grid' ? (
         <PerformaGrid
-          data={projects?.projects ?? []}
+          data={data?.projects ?? []}
           isLoading={isLoading}
           pageSize={9}
           searchPlaceholder="Search projects..."
@@ -150,36 +167,44 @@ function StudioPage() {
           onPageChange={setPage}
           search={q}
           onSearchChange={setSearch}
-          renderItem={(project) => (
-            <div className="group rounded-2xl border border-white/12 bg-white/5 backdrop-blur-xl p-5 transition-colors hover:bg-white/8 cursor-pointer">
-              <div className="h-28 rounded-xl bg-white/5 mb-4 overflow-hidden">
-                <img
-                  src={project.thumbnail}
-                  alt={project.title}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <h3 className="text-sm font-medium text-white/90 truncate group-hover:text-white">
-                    {project.title}
-                  </h3>
-                  <p className="mt-0.5 text-xs text-white/30">
-                    {project.updatedAt} &middot; {project.duration}
-                  </p>
+          totalItems={data?.meta?.itemCount}
+          renderItem={(project) => {
+            const statusLabel = getContentStatusLabel(project.status)
+            return (
+              <div className="group rounded-2xl border border-white/12 bg-white/5 backdrop-blur-xl p-5 transition-colors hover:bg-white/8 cursor-pointer">
+                <div className="h-28 rounded-xl bg-white/5 mb-4 overflow-hidden">
+                  {project.thumbnailUrl ? (
+                    <img
+                      src={project.thumbnailUrl}
+                      alt={project.title}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-white/5" />
+                  )}
                 </div>
-                <Badge
-                  className={`shrink-0 text-[12px] capitalize py-3 ${STATUS_STYLES[project.status]}`}
-                >
-                  {project.status}
-                </Badge>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-medium text-white/90 truncate group-hover:text-white">
+                      {project.title}
+                    </h3>
+                    <p className="mt-0.5 text-xs text-white/30">
+                      {new Date(project.updatedAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <Badge
+                    className={`shrink-0 text-[12px] capitalize py-3 ${STATUS_STYLES[statusLabel] ?? STATUS_STYLES.draft}`}
+                  >
+                    {statusLabel}
+                  </Badge>
+                </div>
               </div>
-            </div>
-          )}
+            )
+          }}
         />
       ) : (
         <PerformaTable
-          data={projects?.projects ?? []}
+          data={data?.projects ?? []}
           columns={studioColumns}
           isLoading={isLoading}
           pageSize={10}
@@ -190,6 +215,7 @@ function StudioPage() {
           onPageChange={setPage}
           search={q}
           onSearchChange={setSearch}
+          totalItems={data?.meta?.itemCount}
         />
       )}
     </div>

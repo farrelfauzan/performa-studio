@@ -6,6 +6,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import appCss from '../styles.css?url'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from '@/components/ui/sonner'
+import { TanStackRouterDevtools } from 'node_modules/@tanstack/react-router-devtools/dist/esm/TanStackRouterDevtools'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -52,6 +53,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           ]}
         />
         <ReactQueryDevtools buttonPosition="top-right" />
+        <TanStackRouterDevtools />
         <Scripts />
         <Toaster />
       </body>

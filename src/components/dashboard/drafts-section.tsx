@@ -1,8 +1,9 @@
 import { Link } from '@tanstack/react-router'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Plus } from 'lucide-react'
 import { useApiQuery } from '@/hooks/use-api'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardAction,
@@ -10,27 +11,25 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { STUDIO_PROJECTS, type StudioProject } from '@/lib/dummy-data'
+import { contentApi } from '@/lib/api'
+import { ContentStatus, type Content } from '@/lib/types'
+import { getContentStatusLabel } from '@/hooks/use-studio'
 
 const STATUS_STYLES: Record<string, string> = {
   draft: 'bg-yellow-500/15 text-yellow-400 border-transparent',
-  'in-progress': 'bg-blue-500/15 text-blue-400 border-transparent',
 }
 
-async function fetchDrafts(): Promise<StudioProject[]> {
-  await new Promise((resolve) => setTimeout(resolve, 650))
-  return STUDIO_PROJECTS.filter(
-    (p) => p.status === 'draft' || p.status === 'in-progress',
-  ).slice(0, 4)
+async function fetchDrafts(): Promise<Content[]> {
+  const res = await contentApi.getAll({ page: 1, pageSize: 4 })
+  const items = res?.data ?? []
+  return items.filter((c: Content) => c.status === ContentStatus.DRAFT)
 }
 
 function DraftsSkeleton() {
   return (
     <Card size="sm" className="bg-card/50 backdrop-blur-xl">
       <CardHeader>
-        <CardTitle className="text-sm font-medium">
-          Drafts &amp; In Progress
-        </CardTitle>
+        <CardTitle className="text-sm font-medium">Drafts</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -57,12 +56,32 @@ export function DraftsSection() {
     return <DraftsSkeleton />
   }
 
+  if (data.length === 0) {
+    return (
+      <Card size="sm" className="bg-card/50 backdrop-blur-xl">
+        <CardHeader>
+          <CardTitle className="text-sm font-medium">Drafts</CardTitle>
+          <CardAction>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/dashboard/studio/create">
+                <Plus className="size-3" /> Create content
+              </Link>
+            </Button>
+          </CardAction>
+        </CardHeader>
+        <CardContent>
+          <p className="py-6 text-center text-sm text-muted-foreground">
+            No drafts yet
+          </p>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card size="sm" className="bg-card/50 backdrop-blur-xl">
       <CardHeader>
-        <CardTitle className="text-sm font-medium">
-          Drafts &amp; In Progress
-        </CardTitle>
+        <CardTitle className="text-sm font-medium">Drafts</CardTitle>
         <CardAction>
           <Link
             to="/dashboard/studio"
@@ -75,34 +94,35 @@ export function DraftsSection() {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {data.map((project) => (
+          {data.map((content) => (
             <Link
-              key={project.id}
+              key={content.id}
               to="/dashboard/studio/$contentId"
-              params={{ contentId: String(project.id) }}
+              params={{ contentId: String(content.id) }}
               search={{} as any}
               className="group -m-2 rounded-xl p-2 transition-colors hover:bg-muted/50"
             >
               <div className="relative aspect-video overflow-hidden rounded-lg">
-                <img
-                  src={project.thumbnail}
-                  alt={project.title}
-                  className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                />
-                <span className="absolute bottom-1 right-1 rounded bg-black/70 px-1.5 py-0.5 text-[10px] text-white/80">
-                  {project.duration}
-                </span>
+                {content.thumbnailUrl ? (
+                  <img
+                    src={content.thumbnailUrl}
+                    alt={content.title}
+                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="h-full w-full bg-white/5" />
+                )}
               </div>
               <div className="mt-2">
-                <p className="truncate text-sm font-medium">{project.title}</p>
+                <p className="truncate text-sm font-medium">{content.title}</p>
                 <div className="mt-1 flex items-center gap-2">
                   <Badge
-                    className={`px-1.5 py-0.5 text-[10px] capitalize ${STATUS_STYLES[project.status]}`}
+                    className={`px-1.5 py-0.5 text-[10px] capitalize ${STATUS_STYLES[getContentStatusLabel(content.status)] ?? ''}`}
                   >
-                    {project.status}
+                    {getContentStatusLabel(content.status)}
                   </Badge>
                   <span className="text-xs text-muted-foreground/60">
-                    {project.updatedAt}
+                    {new Date(content.updatedAt).toLocaleDateString()}
                   </span>
                 </div>
               </div>
