@@ -29,6 +29,7 @@ export type ProfileResponse = {
       permissions: string[]
     }[]
     fullName: string | null
+    profilePicture: string | null
     dateOfBirth: string | null
     phoneNumber: string | null
     address: string | null
@@ -44,6 +45,7 @@ export type SessionUser = {
   email: string
   name: string
   role: string
+  profilePicture: string | null
 }
 
 // ─── Password Reset Types ───────────────────────────────────────────────

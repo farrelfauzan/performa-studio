@@ -12,6 +12,7 @@ export type SessionUser = {
   email: string
   name: string
   role: string
+  profilePicture: string | null
 }
 
 // ─── Server Functions ───────────────────────────────────────────────────
@@ -38,6 +39,7 @@ export const getSession = createServerFn({ method: 'GET' })
           email: string
           roles: { id: string; name: string; permissions: string[] }[]
           fullName: string | null
+          profilePicture: string | null
         }
       }
 
@@ -47,6 +49,7 @@ export const getSession = createServerFn({ method: 'GET' })
         email: profile.email,
         name: profile.fullName || profile.username,
         role: profile.roles?.[0]?.name ?? 'user',
+        profilePicture: profile.profilePicture ?? null,
       }
 
       return sessionUser

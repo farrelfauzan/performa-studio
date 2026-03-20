@@ -34,6 +34,26 @@ export const authApi = {
 
   resetPassword: (data: ResetPasswordRequest) =>
     apiClient.post<ResetPasswordResponse>('/v1/auth/reset-password', data),
+
+  updateProfile: (data: {
+    fullName?: string
+    profilePictureUrl?: string
+    bio?: string
+  }) => apiClient.put<ProfileResponse>('/v1/auth/profile', data),
+
+  getProfilePictureUploadUrl: (data: {
+    filename: string
+    contentType: string
+  }) =>
+    apiClient.post<{
+      data: {
+        uploadUrl: string
+        fields: Record<string, string>
+        s3Key: string
+        publicUrl: string
+        expiresIn: number
+      }
+    }>('/v1/auth/profile/upload-url', data),
 }
 
 // ─── Content API ─────────────────────────────────────────────────────────

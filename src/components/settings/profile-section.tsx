@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   Card,
   CardContent,
@@ -12,20 +12,75 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { toast } from 'sonner'
+import { Loader2 } from 'lucide-react'
+import { authApi, uploadToS3 } from '@/lib/api'
 import type { SessionUser } from '@/server/auth'
 
 export function ProfileSection({ user }: { user: SessionUser }) {
   const [name, setName] = useState(user?.name ?? '')
   const [email] = useState(user?.email ?? '')
-  const [bio, setBio] = useState(
-    'Content creator and educator passionate about sharing knowledge.',
+  const [bio, setBio] = useState('')
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(
+    user?.profilePicture ?? null,
   )
+  const [uploading, setUploading] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const initials = (user?.name ?? '')
     .split(' ')
     .map((n) => n[0])
     .join('')
     .toUpperCase()
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('File too large. Max 2MB.')
+      return
+    }
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Only image files are allowed.')
+      return
+    }
+
+    setUploading(true)
+    try {
+      const { data } = await authApi.getProfilePictureUploadUrl({
+        filename: file.name,
+        contentType: file.type,
+      })
+
+      await uploadToS3(data.uploadUrl, data.fields, file)
+
+      await authApi.updateProfile({
+        profilePictureUrl: data.publicUrl,
+      })
+
+      setAvatarUrl(data.publicUrl)
+      toast.success('Profile picture updated')
+    } catch {
+      toast.error('Failed to upload profile picture')
+    } finally {
+      setUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      await authApi.updateProfile({ fullName: name, bio })
+      toast.success('Profile updated successfully')
+    } catch {
+      toast.error('Failed to update profile')
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
     <Card className="border-white/10 bg-card/50 backdrop-blur-sm">
@@ -40,7 +95,10 @@ export function ProfileSection({ user }: { user: SessionUser }) {
         <div className="flex items-center gap-4">
           <Avatar className="h-16 w-16">
             <AvatarImage
-              src={`https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(user?.name ?? 'U')}`}
+              src={
+                avatarUrl ??
+                `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(user?.name ?? 'U')}`
+              }
               alt={name}
             />
             <AvatarFallback className="bg-white/15 text-foreground text-lg">
@@ -48,8 +106,27 @@ export function ProfileSection({ user }: { user: SessionUser }) {
             </AvatarFallback>
           </Avatar>
           <div>
-            <Button variant="outline" size="sm">
-              Change avatar
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/gif,image/webp"
+              className="hidden"
+              onChange={handleAvatarUpload}
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={uploading}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {uploading ? (
+                <>
+                  <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                  Uploading…
+                </>
+              ) : (
+                'Change avatar'
+              )}
             </Button>
             <p className="mt-1 text-xs text-muted-foreground">
               JPG, PNG or GIF. Max 2MB.
@@ -98,8 +175,15 @@ export function ProfileSection({ user }: { user: SessionUser }) {
         </div>
 
         <div className="flex justify-end">
-          <Button onClick={() => toast.success('Profile updated successfully')}>
-            Save changes
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? (
+              <>
+                <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                Saving…
+              </>
+            ) : (
+              'Save changes'
+            )}
           </Button>
         </div>
       </CardContent>
