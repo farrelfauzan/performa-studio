@@ -4,46 +4,64 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Field, FieldError } from '@/components/ui/field'
-import { useRouter } from '@tanstack/react-router'
-import { Link } from '@tanstack/react-router'
 import { validateWithZod } from '@/lib/utils'
-import { loginFn } from '@/server/auth'
+import { resetPasswordFn } from '@/server/auth'
 import { useState } from 'react'
-import { useAuthStore } from '@/stores/auth-store'
+import { Link, useRouter } from '@tanstack/react-router'
 
-const emailSchema = z.email({
-  error: 'Invalid email address',
-})
 const passwordSchema = z
   .string()
-  .min(6, 'Password must be at least 6 characters')
+  .min(8, 'Password must be at least 8 characters')
+  .regex(/[A-Z]/, 'Must contain at least one uppercase letter')
+  .regex(/[0-9]/, 'Must contain at least one number')
+  .regex(/[^a-zA-Z0-9]/, 'Must contain at least one special character')
 
-export function LoginForm() {
+export function ResetPasswordForm({ token }: { token: string }) {
   const router = useRouter()
   const [serverError, setServerError] = useState<string | null>(null)
-  const { setAuth } = useAuthStore()
+  const [success, setSuccess] = useState(false)
 
   const form = useForm({
     defaultValues: {
-      email: '',
-      password: '',
+      newPassword: '',
+      confirmPassword: '',
     },
     onSubmit: async ({ value }) => {
       setServerError(null)
-      const result = await loginFn({ data: value })
+
+      if (value.newPassword !== value.confirmPassword) {
+        setServerError('Passwords do not match')
+        return
+      }
+
+      const result = await resetPasswordFn({
+        data: { token, newPassword: value.newPassword },
+      })
 
       if (result.error) {
         setServerError(result.error)
         return
       }
 
-      if (result.user && result.accessToken) {
-        setAuth(result.accessToken, result.user)
-        router.navigate({ to: '/dashboard' })
-      }
-
+      setSuccess(true)
     },
   })
+
+  if (success) {
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="rounded-lg bg-green-500/15 border border-green-500/25 px-4 py-3 text-sm text-green-300">
+          Your password has been reset successfully.
+        </div>
+        <Button
+          onClick={() => router.navigate({ to: '/login' })}
+          className="bg-white/20 hover:bg-white/30 border border-white/30 text-white backdrop-blur-sm cursor-pointer transition-all"
+        >
+          Go to Login
+        </Button>
+      </div>
+    )
+  }
 
   return (
     <form
@@ -61,20 +79,20 @@ export function LoginForm() {
       )}
 
       <form.Field
-        name="email"
+        name="newPassword"
         validators={{
-          onChange: validateWithZod(emailSchema),
+          onChange: validateWithZod(passwordSchema),
         }}
       >
         {(field) => (
           <Field data-invalid={field.state.meta.errors.length > 0}>
-            <Label htmlFor="email" className="text-white/90">
-              Email
+            <Label htmlFor="newPassword" className="text-white/90">
+              New Password
             </Label>
             <Input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
+              id="newPassword"
+              type="password"
+              placeholder="Enter new password"
               value={field.state.value}
               onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
@@ -88,20 +106,20 @@ export function LoginForm() {
       </form.Field>
 
       <form.Field
-        name="password"
+        name="confirmPassword"
         validators={{
           onChange: validateWithZod(passwordSchema),
         }}
       >
         {(field) => (
           <Field data-invalid={field.state.meta.errors.length > 0}>
-            <Label htmlFor="password" className="text-white/90">
-              Password
+            <Label htmlFor="confirmPassword" className="text-white/90">
+              Confirm Password
             </Label>
             <Input
-              id="password"
+              id="confirmPassword"
               type="password"
-              placeholder="Enter your password"
+              placeholder="Confirm new password"
               value={field.state.value}
               onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
@@ -121,16 +139,16 @@ export function LoginForm() {
             disabled={isSubmitting}
             className="mt-2 bg-white/20 hover:bg-white/30 border border-white/30 text-white backdrop-blur-sm cursor-pointer transition-all"
           >
-            {isSubmitting ? 'Signing in...' : 'Sign in'}
+            {isSubmitting ? 'Resetting...' : 'Reset Password'}
           </Button>
         )}
       </form.Subscribe>
 
       <Link
-        to="/forgot-password"
+        to="/login"
         className="text-center text-sm text-white/60 hover:text-white/80 transition-colors"
       >
-        Forgot your password?
+        Back to login
       </Link>
     </form>
   )

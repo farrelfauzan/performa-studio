@@ -155,6 +155,80 @@ export const logoutFn = createServerFn({ method: 'POST' }).handler(async () => {
   deleteCookie('refreshToken')
 })
 
+/** Request a password reset token for the given email */
+export const requestPasswordResetFn = createServerFn({ method: 'POST' })
+  .inputValidator(
+    z.object({
+      email: z.email({ error: 'Invalid email address' }),
+    }),
+  )
+  .handler(async ({ data }) => {
+    try {
+      const res = await fetch(`${API_URL}/v1/auth/request-password-reset`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: data.email }),
+      })
+
+      if (!res.ok) {
+        const error = await res.json().catch(() => null)
+        return {
+          error:
+            (error as { message?: string })?.message ||
+            'Failed to request password reset',
+          resetToken: null,
+        }
+      }
+
+      const json = (await res.json()) as {
+        data: { message: string; resetToken: string }
+      }
+
+      return { error: null, resetToken: json.data.resetToken }
+    } catch {
+      return {
+        error: 'An error occurred. Please try again.',
+        resetToken: null,
+      }
+    }
+  })
+
+/** Reset password using a token */
+export const resetPasswordFn = createServerFn({ method: 'POST' })
+  .inputValidator(
+    z.object({
+      token: z.string().min(1),
+      newPassword: z.string().min(8),
+    }),
+  )
+  .handler(async ({ data }) => {
+    try {
+      const res = await fetch(`${API_URL}/v1/auth/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: data.token,
+          newPassword: data.newPassword,
+        }),
+      })
+
+      if (!res.ok) {
+        const error = await res.json().catch(() => null)
+        return {
+          error:
+            (error as { message?: string })?.message ||
+            'Failed to reset password',
+        }
+      }
+
+      return { error: null }
+    } catch {
+      return {
+        error: 'An error occurred. Please try again.',
+      }
+    }
+  })
+
 /** Guard: require auth or redirect to login */
 export const requireAuth = createServerFn({ method: 'GET' })
   .middleware([authMiddleware])

@@ -46,6 +46,30 @@ export type SessionUser = {
   role: string
 }
 
+// ─── Password Reset Types ───────────────────────────────────────────────
+
+export type RequestPasswordResetRequest = {
+  email: string
+}
+
+export type RequestPasswordResetResponse = {
+  data: {
+    message: string
+    resetToken: string
+  }
+}
+
+export type ResetPasswordRequest = {
+  token: string
+  newPassword: string
+}
+
+export type ResetPasswordResponse = {
+  data: {
+    message: string
+  }
+}
+
 // ─── Pagination ─────────────────────────────────────────────────────────
 
 export type PageMeta = {

@@ -3,6 +3,10 @@ import type {
   LoginRequest,
   LoginResponse,
   ProfileResponse,
+  RequestPasswordResetRequest,
+  RequestPasswordResetResponse,
+  ResetPasswordRequest,
+  ResetPasswordResponse,
   GetAllContentsResponse,
   GetContentByIdResponse,
   CreateContentWithSectionsRequest,
@@ -21,6 +25,15 @@ export const authApi = {
     apiClient.post<LoginResponse>('/v1/auth/login', data),
 
   getMe: () => apiClient.get<ProfileResponse>('/v1/auth/getMe'),
+
+  requestPasswordReset: (data: RequestPasswordResetRequest) =>
+    apiClient.post<RequestPasswordResetResponse>(
+      '/v1/auth/request-password-reset',
+      data,
+    ),
+
+  resetPassword: (data: ResetPasswordRequest) =>
+    apiClient.post<ResetPasswordResponse>('/v1/auth/reset-password', data),
 }
 
 // ─── Content API ─────────────────────────────────────────────────────────
