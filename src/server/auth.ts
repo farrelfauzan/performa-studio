@@ -92,7 +92,12 @@ export const loginFn = createServerFn({ method: 'POST' })
         data: {
           accessToken: string
           refreshToken: string
-          user?: { id: string; username: string; email: string }
+          user?: {
+            id: string
+            username: string
+            email: string
+            profilePicture: string | null
+          }
         }
       }
 
@@ -124,6 +129,7 @@ export const loginFn = createServerFn({ method: 'POST' })
             email: string
             roles: { id: string; name: string; permissions: string[] }[]
             fullName: string | null
+            profilePicture: string | null
           }
         }
         const profile = profileJson.data
@@ -132,6 +138,7 @@ export const loginFn = createServerFn({ method: 'POST' })
           email: profile.email,
           name: profile.fullName || profile.username,
           role: profile.roles?.[0]?.name ?? 'user',
+          profilePicture: profile.profilePicture ?? null,
         }
       } else {
         sessionUser = {
@@ -139,6 +146,7 @@ export const loginFn = createServerFn({ method: 'POST' })
           email: loginUser?.email ?? data.email,
           name: loginUser?.username ?? data.email,
           role: 'user',
+          profilePicture: loginUser?.profilePicture ?? null,
         }
       }
 
@@ -257,6 +265,7 @@ export const requireAuth = createServerFn({ method: 'GET' })
           email: string
           roles: { id: string; name: string; permissions: string[] }[]
           fullName: string | null
+          profilePicture: string | null
         }
       }
 
@@ -266,6 +275,7 @@ export const requireAuth = createServerFn({ method: 'GET' })
         email: profile.email,
         name: profile.fullName || profile.username,
         role: profile.roles?.[0]?.name ?? 'user',
+        profilePicture: profile.profilePicture ?? null,
       } satisfies SessionUser
     } catch (e) {
       if (e && typeof e === 'object' && 'to' in e) throw e // re-throw redirect

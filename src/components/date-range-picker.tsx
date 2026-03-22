@@ -102,20 +102,23 @@ export function DateRangePicker({
   }, [from, to])
 
   function applyPreset(preset: Preset) {
-    const range = preset.getValue()
-    setDraft(range)
-    if (range.from && range.to) {
-      onRangeChange({ from: range.from, to: range.to })
-    }
-    setOpen(false)
+    setDraft(preset.getValue())
   }
 
   function handleSelect(range: DateRange | undefined) {
     setDraft(range)
-    if (range?.from && range?.to) {
-      onRangeChange({ from: range.from, to: range.to })
-      setOpen(false)
+  }
+
+  function handleApply() {
+    if (draft?.from && draft?.to) {
+      onRangeChange({ from: draft.from, to: draft.to })
     }
+    setOpen(false)
+  }
+
+  function handleCancel() {
+    setDraft(from && to ? { from, to } : undefined)
+    setOpen(false)
   }
 
   return (
@@ -169,6 +172,20 @@ export function DateRangePicker({
               disabled={{ after: new Date() }}
             />
           </div>
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex items-center justify-end gap-2 border-t border-border px-4 py-3">
+          <Button variant="ghost" size="sm" onClick={handleCancel}>
+            Cancel
+          </Button>
+          <Button
+            size="sm"
+            disabled={!draft?.from || !draft?.to}
+            onClick={handleApply}
+          >
+            Update
+          </Button>
         </div>
       </PopoverContent>
     </Popover>

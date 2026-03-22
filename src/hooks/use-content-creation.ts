@@ -28,6 +28,15 @@ function buildPayload(
         mimeType: v.file?.type ?? 'video/mp4',
         fileSize: v.file?.size ?? 0,
       })),
+      documents: s.documents
+        .filter((d) => d.file)
+        .map((d, dIdx) => ({
+          title: d.title,
+          sortOrder: dIdx,
+          fileName: d.file!.name,
+          mimeType: d.file!.type || 'application/octet-stream',
+          fileSize: d.file!.size,
+        })),
     })),
   }
 
@@ -70,6 +79,22 @@ function collectFiles(store: ReturnType<typeof useStudioStore.getState>) {
   return fileMap
 }
 
+function collectDocumentFiles(
+  store: ReturnType<typeof useStudioStore.getState>,
+) {
+  const fileMap = new Map<string, File>()
+
+  store.sections.forEach((section) => {
+    section.documents.forEach((doc) => {
+      if (doc.file) {
+        fileMap.set(doc.id, doc.file)
+      }
+    })
+  })
+
+  return fileMap
+}
+
 async function uploadFiles(
   response: CreateContentWithSectionsResponse['data'],
   store: ReturnType<typeof useStudioStore.getState>,
@@ -88,6 +113,22 @@ async function uploadFiles(
         uploads.push(uploadToS3(urlInfo.uploadUrl, urlInfo.fields, file))
       }
       urlIdx++
+    }
+  }
+
+  // Upload documents — match documentUploadUrls to section document files
+  const docFileMap = collectDocumentFiles(store)
+  const docUploadUrls = response.documentUploadUrls ?? []
+  let docUrlIdx = 0
+  for (const section of store.sections) {
+    for (const doc of section.documents) {
+      if (!doc.file) continue
+      const urlInfo: UploadUrlInfo | undefined = docUploadUrls[docUrlIdx]
+      const file = docFileMap.get(doc.id)
+      if (urlInfo && file) {
+        uploads.push(uploadToS3(urlInfo.uploadUrl, urlInfo.fields, file))
+      }
+      docUrlIdx++
     }
   }
 
@@ -121,7 +162,7 @@ export function useContentCreation() {
 
   const createAndUpload = async () => {
     const state = store.getState()
-    const payload = buildPayload(state, ContentStatus.PUBLISHED)
+    const payload = buildPayload(state, ContentStatus.WAITING_REVIEW)
 
     // Phase 1: Create content + get presigned URLs
     const { data } = await contentApi.create(payload)

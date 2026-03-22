@@ -25,11 +25,18 @@ export const lessonVideoSchema = z.object({
   file: z.instanceof(File, { message: 'Video file is required' }).nullable(),
 })
 
+export const sectionDocumentSchema = z.object({
+  id: z.string(),
+  title: z.string().min(1, 'Document title is required'),
+  file: z.instanceof(File, { message: 'Document file is required' }).nullable(),
+})
+
 export const sectionSchema = z.object({
   id: z.string(),
   title: z.string().min(1, 'Section title is required'),
   description: z.string(),
   videos: z.array(lessonVideoSchema).min(1, 'At least one video is required'),
+  documents: z.array(sectionDocumentSchema),
   isOpen: z.boolean(),
 })
 
@@ -49,6 +56,7 @@ export const stepSchemas = [
 // ─── Full form schema ──────────────────────────────────────────────────
 
 export type LessonVideo = z.infer<typeof lessonVideoSchema>
+export type SectionDocument = z.infer<typeof sectionDocumentSchema>
 export type Section = z.infer<typeof sectionSchema>
 export type GeneralDetails = z.infer<typeof generalDetailsSchema>
 export type UploadMedia = z.infer<typeof uploadMediaSchema>

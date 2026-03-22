@@ -172,7 +172,7 @@ function StudioPage() {
             const statusLabel = getContentStatusLabel(project.status)
             return (
               <div className="group rounded-2xl border border-white/12 bg-white/5 backdrop-blur-xl p-5 transition-colors hover:bg-white/8 cursor-pointer">
-                <div className="h-28 rounded-xl bg-white/5 mb-4 overflow-hidden">
+                <div className="aspect-video rounded-xl bg-white/5 mb-4 overflow-hidden">
                   {project.thumbnailUrl ? (
                     <img
                       src={project.thumbnailUrl}

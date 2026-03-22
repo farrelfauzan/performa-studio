@@ -35,12 +35,12 @@ function UploadZone({
     return (
       <div className="relative rounded-xl border border-white/12 bg-white/5 overflow-hidden">
         {accept.startsWith('video') ? (
-          <video src={preview} controls className="w-full h-48 object-cover" />
+          <video src={preview} controls className="w-full aspect-video object-cover" />
         ) : (
           <img
             src={preview}
             alt="Preview"
-            className="w-full h-48 object-cover"
+            className="w-full aspect-video object-cover"
           />
         )}
         <Button
@@ -97,6 +97,7 @@ export function StepUploadMedia() {
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <div className="space-y-2">
           <Label>Thumbnail</Label>
+          <p className="text-xs text-white/30">Recommended ratio 16:9 (e.g. 1280×720)</p>
           <UploadZone
             label="Upload thumbnail image"
             accept="image/*"
@@ -118,6 +119,7 @@ export function StepUploadMedia() {
 
         <div className="space-y-2">
           <Label>Preview Video</Label>
+          <p className="text-xs text-white/30">Recommended ratio 16:9 (e.g. 1920×1080)</p>
           <UploadZone
             label="Upload preview video"
             accept="video/*"

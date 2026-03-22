@@ -52,6 +52,15 @@ type StudioFormActions = {
   ) => void
   removeVideo: (sectionId: string, videoId: string) => void
 
+  // Document actions
+  addDocument: (sectionId: string) => void
+  updateDocument: (
+    sectionId: string,
+    docId: string,
+    patch: Partial<Section['documents'][number]>,
+  ) => void
+  removeDocument: (sectionId: string, docId: string) => void
+
   // Validation
   validateStep: (step: number) => boolean
   clearError: (key: string) => void
@@ -112,6 +121,7 @@ export const useStudioStore = create<StudioFormState & StudioFormActions>(
             title: '',
             description: '',
             videos: [],
+            documents: [],
             isOpen: true,
           },
         ],
@@ -196,6 +206,63 @@ export const useStudioStore = create<StudioFormState & StudioFormActions>(
         sections: s.sections.map((sec) =>
           sec.id === sectionId
             ? { ...sec, videos: sec.videos.filter((v) => v.id !== videoId) }
+            : sec,
+        ),
+      })),
+
+    // ── Document actions ──
+
+    addDocument: (sectionId) =>
+      set((s) => ({
+        sections: s.sections.map((sec) =>
+          sec.id === sectionId
+            ? {
+                ...sec,
+                documents: [
+                  ...sec.documents,
+                  { id: genId(), title: '', file: null },
+                ],
+              }
+            : sec,
+        ),
+      })),
+
+    updateDocument: (sectionId, docId, patch) =>
+      set((s) => {
+        const sIdx = s.sections.findIndex((sec) => sec.id === sectionId)
+        const dIdx =
+          sIdx >= 0
+            ? s.sections[sIdx].documents.findIndex((d) => d.id === docId)
+            : -1
+        const newErrors = { ...s.errors }
+        if (sIdx >= 0 && dIdx >= 0) {
+          for (const field of Object.keys(patch)) {
+            delete newErrors[`sections.${sIdx}.documents.${dIdx}.${field}`]
+          }
+        }
+        return {
+          sections: s.sections.map((sec) =>
+            sec.id === sectionId
+              ? {
+                  ...sec,
+                  documents: sec.documents.map((d) =>
+                    d.id === docId ? { ...d, ...patch } : d,
+                  ),
+                }
+              : sec,
+          ),
+          errors: newErrors,
+        }
+      }),
+
+    removeDocument: (sectionId, docId) =>
+      set((s) => ({
+        sections: s.sections.map((sec) =>
+          sec.id === sectionId
+            ? {
+                ...sec,
+                documents: sec.documents.filter((d) => d.id !== docId),
+              }
             : sec,
         ),
       })),

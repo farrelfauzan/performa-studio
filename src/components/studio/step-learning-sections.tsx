@@ -5,6 +5,7 @@ import {
   Upload,
   ChevronDown,
   ChevronUp,
+  FileText,
 } from 'lucide-react'
 import { useStudioStore } from '@/stores/studio-store'
 import { Button } from '@/components/ui/button'
@@ -22,6 +23,9 @@ export function StepLearningSections() {
     addVideo,
     updateVideo,
     removeVideo,
+    addDocument,
+    updateDocument,
+    removeDocument,
   } = useStudioStore()
 
   return (
@@ -76,7 +80,10 @@ export function StepLearningSections() {
                 </span>
                 <span className="text-xs text-white/30">
                   ({section.videos.length}{' '}
-                  {section.videos.length === 1 ? 'video' : 'videos'})
+                  {section.videos.length === 1 ? 'video' : 'videos'}
+                  {section.documents.length > 0 &&
+                    `, ${section.documents.length} ${section.documents.length === 1 ? 'doc' : 'docs'}`}
+                  )
                 </span>
                 {section.isOpen ? (
                   <ChevronUp className="ml-auto h-4 w-4 text-white/30" />
@@ -230,6 +237,95 @@ export function StepLearningSections() {
                         {errors[`sections.${sIdx}.videos.${vIdx}.title`] && (
                           <p className="text-xs text-red-400 pl-10">
                             {errors[`sections.${sIdx}.videos.${vIdx}.title`]}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Documents (optional) */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs">
+                      Documents{' '}
+                      <span className="text-white/30">(optional)</span>
+                    </Label>
+                    <Button
+                      variant="ghost"
+                      size="xs"
+                      onClick={() => addDocument(section.id)}
+                    >
+                      <Plus className="h-3 w-3" />
+                      Add Document
+                    </Button>
+                  </div>
+
+                  {section.documents.length === 0 && (
+                    <div className="rounded-lg border border-dashed border-white/12 py-4 text-center">
+                      <p className="text-xs text-white/30">
+                        No documents in this section
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    {section.documents.map((doc, dIdx) => (
+                      <div key={doc.id} className="space-y-1">
+                        <div className="flex items-center gap-3 rounded-lg border border-white/8 bg-white/2 px-3 py-2.5">
+                          <FileText className="h-3.5 w-3.5 shrink-0 text-white/15" />
+                          <span className="text-xs font-medium text-white/30 w-5">
+                            {dIdx + 1}.
+                          </span>
+                          <Input
+                            value={doc.title}
+                            onChange={(e) =>
+                              updateDocument(section.id, doc.id, {
+                                title: e.target.value,
+                              })
+                            }
+                            placeholder="Document title"
+                            className="h-7 flex-1 border-none bg-transparent"
+                          />
+                          <label className="flex h-7 cursor-pointer items-center gap-1 rounded border border-white/12 bg-white/5 px-2 text-xs text-white/50 transition-colors hover:bg-white/8">
+                            <Upload className="h-3 w-3" />
+                            {doc.file ? (
+                              <span className="max-w-24 truncate text-blue-400">
+                                {doc.file.name}
+                              </span>
+                            ) : (
+                              'File'
+                            )}
+                            <input
+                              type="file"
+                              accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0] ?? null
+                                updateDocument(section.id, doc.id, { file })
+                              }}
+                            />
+                          </label>
+                          <Button
+                            variant="ghost"
+                            size="icon-xs"
+                            onClick={() =>
+                              removeDocument(section.id, doc.id)
+                            }
+                            className="shrink-0 text-white/25 hover:text-red-400"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        {errors[
+                          `sections.${sIdx}.documents.${dIdx}.title`
+                        ] && (
+                          <p className="text-xs text-red-400 pl-10">
+                            {
+                              errors[
+                                `sections.${sIdx}.documents.${dIdx}.title`
+                              ]
+                            }
                           </p>
                         )}
                       </div>

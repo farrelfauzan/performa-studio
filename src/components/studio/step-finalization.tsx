@@ -1,6 +1,7 @@
 import { Info } from 'lucide-react'
 import { useStudioStore } from '@/stores/studio-store'
 import { Card, CardContent } from '@/components/ui/card'
+import { useCategories } from '@/hooks/use-categories'
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
@@ -25,6 +26,13 @@ export function StepFinalization() {
   } = useStudioStore()
 
   const totalVideos = sections.reduce((sum, s) => sum + s.videos.length, 0)
+  const totalDocuments = sections.reduce(
+    (sum, s) => sum + s.documents.length,
+    0,
+  )
+
+  const { data: categories = [] } = useCategories()
+  const categoryName = categories.find((c) => c.id === category)?.name ?? ''
 
   return (
     <div className="space-y-6">
@@ -48,7 +56,7 @@ export function StepFinalization() {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Card size="sm" className="bg-white/5 backdrop-blur-xl ring-white/12">
           <CardContent>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -69,6 +77,16 @@ export function StepFinalization() {
             </p>
           </CardContent>
         </Card>
+        <Card size="sm" className="bg-white/5 backdrop-blur-xl ring-white/12">
+          <CardContent>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Total Documents
+            </p>
+            <p className="mt-1 text-2xl font-semibold text-white">
+              {totalDocuments}
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Details */}
@@ -76,7 +94,7 @@ export function StepFinalization() {
         <CardContent className="divide-y divide-border/50">
           <SummaryRow label="Title" value={title || '—'} />
           <SummaryRow label="Year" value={year || '—'} />
-          <SummaryRow label="Category" value={category || '—'} />
+          <SummaryRow label="Category" value={categoryName || '—'} />
           <SummaryRow label="Description" value={description || '—'} />
           <SummaryRow
             label="Thumbnail"
@@ -114,8 +132,8 @@ export function StepFinalization() {
                     </div>
                     <span className="text-xs text-white/30">
                       {section.videos.length}{' '}
-                      {section.videos.length === 1 ? 'video' : 'videos'}
-                    </span>
+                      {section.videos.length === 1 ? 'video' : 'videos'}                      {section.documents.length > 0 &&
+                        `, ${section.documents.length} ${section.documents.length === 1 ? 'doc' : 'docs'}`}                    </span>
                   </div>
                   {section.videos.length > 0 && (
                     <div className="mt-2 ml-7 space-y-1">
@@ -129,6 +147,26 @@ export function StepFinalization() {
                           </span>
                           <span className="text-white/30">
                             {video.duration || '—'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {section.documents.length > 0 && (
+                    <div className="mt-2 ml-7 space-y-1">
+                      <p className="text-[10px] uppercase tracking-wider text-white/25">
+                        Documents
+                      </p>
+                      {section.documents.map((doc, dIdx) => (
+                        <div
+                          key={doc.id}
+                          className="flex items-center justify-between text-xs"
+                        >
+                          <span className="text-white/50">
+                            {dIdx + 1}. {doc.title || 'Untitled Document'}
+                          </span>
+                          <span className="text-white/30">
+                            {doc.file?.name || '—'}
                           </span>
                         </div>
                       ))}

@@ -9,10 +9,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useCategories } from '@/hooks/use-categories'
 
 export function StepGeneralDetails() {
   const { title, year, category, description, errors, setField } =
     useStudioStore()
+  const { data: categories = [] } = useCategories()
 
   return (
     <div className="space-y-6">
@@ -56,12 +58,11 @@ export function StepGeneralDetails() {
               <SelectValue placeholder="Select a category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="design">Design</SelectItem>
-              <SelectItem value="development">Development</SelectItem>
-              <SelectItem value="marketing">Marketing</SelectItem>
-              <SelectItem value="business">Business</SelectItem>
-              <SelectItem value="photography">Photography</SelectItem>
-              <SelectItem value="music">Music</SelectItem>
+              {categories.map((cat) => (
+                <SelectItem key={cat.id} value={cat.id}>
+                  {cat.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           {errors.category && (

@@ -103,9 +103,10 @@ export enum ContentStatus {
   DRAFT = 0,
   PUBLISHED = 1,
   ARCHIVED = 2,
+  WAITING_REVIEW = 3,
 }
 
-export type ContentMediaType = 0 | 1 // 0=IMAGE, 1=VIDEO
+export type ContentMediaType = 0 | 1 | 2 // 0=IMAGE, 1=VIDEO, 2=DOCUMENT
 
 export type ContentProcessingStatus = 0 | 1 | 2 | 3 // PENDING, PROCESSING, COMPLETED, FAILED
 
@@ -127,6 +128,7 @@ export type ContentMedia = {
   title: string | null
   createdAt: string
   updatedAt: string
+  downloadUrl: string | null
 }
 
 export type ContentSection = {
@@ -136,6 +138,13 @@ export type ContentSection = {
   description: string | null
   sortOrder: number
   medias: ContentMedia[]
+  createdAt: string
+  updatedAt: string
+}
+
+export type Category = {
+  id: string
+  name: string
   createdAt: string
   updatedAt: string
 }
@@ -155,6 +164,7 @@ export type Content = {
   deletedAt: string | null
   sections?: ContentSection[]
   contentMedias?: ContentMedia[]
+  category?: Category | null
 }
 
 export type GetAllContentsResponse = PaginatedResponse<Content>
@@ -176,11 +186,20 @@ export type CreateSectionVideoInput = {
   fileSize: number
 }
 
+export type CreateSectionDocumentInput = {
+  title: string
+  sortOrder: number
+  fileName: string
+  mimeType: string
+  fileSize: number
+}
+
 export type CreateSectionInput = {
   title: string
   description?: string
   sortOrder: number
   videos: CreateSectionVideoInput[]
+  documents?: CreateSectionDocumentInput[]
 }
 
 export type FileInput = {
@@ -215,6 +234,7 @@ export type CreateContentWithSectionsResponse = {
     uploadUrls: UploadUrlInfo[]
     thumbnailUploadUrl?: UploadUrlInfo
     previewUploadUrl?: UploadUrlInfo
+    documentUploadUrls?: UploadUrlInfo[]
   }
 }
 

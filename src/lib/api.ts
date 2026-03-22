@@ -16,6 +16,7 @@ import type {
   UpdateContentResponse,
   DeleteContentResponse,
   PageParams,
+  Category,
 } from './types'
 
 // ─── Auth API ────────────────────────────────────────────────────────────
@@ -66,6 +67,9 @@ export const contentApi = {
     apiClient.get<GetContentByIdResponse>(
       `/v1/contents/${encodeURIComponent(id)}`,
     ),
+
+  getCategories: () =>
+    apiClient.get<{ data: Category[] }>('/v1/contents/categories'),
 
   create: (data: CreateContentWithSectionsRequest) =>
     apiClient.post<CreateContentWithSectionsResponse>(
