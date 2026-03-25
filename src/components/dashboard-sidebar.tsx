@@ -7,6 +7,8 @@ import {
   LogOut,
   Settings,
   ChevronsUpDown,
+  GraduationCap,
+  ClipboardList,
 } from 'lucide-react'
 import { logoutFn } from '@/server/auth'
 import { useAuthStore } from '@/stores/auth-store'
@@ -43,6 +45,16 @@ const sidebarItems = [
     label: 'Studio',
     to: '/dashboard/studio',
     icon: Clapperboard,
+  },
+  {
+    label: 'Students',
+    to: '/dashboard/students',
+    icon: GraduationCap,
+  },
+  {
+    label: 'Assignments',
+    to: '/dashboard/assignments',
+    icon: ClipboardList,
   },
   {
     label: 'Analytics',

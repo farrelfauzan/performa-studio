@@ -19,8 +19,12 @@ import { Route as dashboardDashboardStudioRouteImport } from './routes/(dashboar
 import { Route as dashboardDashboardSettingsRouteImport } from './routes/(dashboard)/dashboard/settings'
 import { Route as dashboardDashboardCommunityRouteImport } from './routes/(dashboard)/dashboard/community'
 import { Route as dashboardDashboardAnalyticsRouteImport } from './routes/(dashboard)/dashboard/analytics'
+import { Route as dashboardDashboardAssignmentsRouteImport } from './routes/(dashboard)/dashboard/assignments'
+import { Route as dashboardDashboardStudentsIndexRouteImport } from './routes/(dashboard)/dashboard/students/index'
 import { Route as dashboardDashboardStudioCreateRouteImport } from './routes/(dashboard)/dashboard/studio_.create'
 import { Route as dashboardDashboardStudioContentIdRouteImport } from './routes/(dashboard)/dashboard/studio_.$contentId'
+import { Route as dashboardDashboardStudentsCreateRouteImport } from './routes/(dashboard)/dashboard/students/create'
+import { Route as dashboardDashboardStudentsStudentIdRouteImport } from './routes/(dashboard)/dashboard/students/$studentId'
 import { Route as dashboardDashboardCommunitySubscriptionEditRouteImport } from './routes/(dashboard)/dashboard/community_.subscription-edit'
 import { Route as dashboardDashboardCommunitySubscriptionCreateRouteImport } from './routes/(dashboard)/dashboard/community_.subscription-create'
 
@@ -78,6 +82,18 @@ const dashboardDashboardAnalyticsRoute =
     path: '/analytics',
     getParentRoute: () => dashboardDashboardRoute,
   } as any)
+const dashboardDashboardAssignmentsRoute =
+  dashboardDashboardAssignmentsRouteImport.update({
+    id: '/assignments',
+    path: '/assignments',
+    getParentRoute: () => dashboardDashboardRoute,
+  } as any)
+const dashboardDashboardStudentsIndexRoute =
+  dashboardDashboardStudentsIndexRouteImport.update({
+    id: '/students/',
+    path: '/students/',
+    getParentRoute: () => dashboardDashboardRoute,
+  } as any)
 const dashboardDashboardStudioCreateRoute =
   dashboardDashboardStudioCreateRouteImport.update({
     id: '/studio_/create',
@@ -88,6 +104,18 @@ const dashboardDashboardStudioContentIdRoute =
   dashboardDashboardStudioContentIdRouteImport.update({
     id: '/studio_/$contentId',
     path: '/studio/$contentId',
+    getParentRoute: () => dashboardDashboardRoute,
+  } as any)
+const dashboardDashboardStudentsCreateRoute =
+  dashboardDashboardStudentsCreateRouteImport.update({
+    id: '/students/create',
+    path: '/students/create',
+    getParentRoute: () => dashboardDashboardRoute,
+  } as any)
+const dashboardDashboardStudentsStudentIdRoute =
+  dashboardDashboardStudentsStudentIdRouteImport.update({
+    id: '/students/$studentId',
+    path: '/students/$studentId',
     getParentRoute: () => dashboardDashboardRoute,
   } as any)
 const dashboardDashboardCommunitySubscriptionEditRoute =
@@ -116,8 +144,11 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof dashboardDashboardIndexRoute
   '/dashboard/community/subscription-create': typeof dashboardDashboardCommunitySubscriptionCreateRoute
   '/dashboard/community/subscription-edit': typeof dashboardDashboardCommunitySubscriptionEditRoute
+  '/dashboard/students/$studentId': typeof dashboardDashboardStudentsStudentIdRoute
+  '/dashboard/students/create': typeof dashboardDashboardStudentsCreateRoute
   '/dashboard/studio/$contentId': typeof dashboardDashboardStudioContentIdRoute
   '/dashboard/studio/create': typeof dashboardDashboardStudioCreateRoute
+  '/dashboard/students/': typeof dashboardDashboardStudentsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -125,14 +156,18 @@ export interface FileRoutesByTo {
   '/login': typeof authLoginRoute
   '/reset-password': typeof authResetPasswordRoute
   '/dashboard/analytics': typeof dashboardDashboardAnalyticsRoute
+  '/dashboard/assignments': typeof dashboardDashboardAssignmentsRoute
   '/dashboard/community': typeof dashboardDashboardCommunityRoute
   '/dashboard/settings': typeof dashboardDashboardSettingsRoute
   '/dashboard/studio': typeof dashboardDashboardStudioRoute
   '/dashboard': typeof dashboardDashboardIndexRoute
   '/dashboard/community/subscription-create': typeof dashboardDashboardCommunitySubscriptionCreateRoute
   '/dashboard/community/subscription-edit': typeof dashboardDashboardCommunitySubscriptionEditRoute
+  '/dashboard/students/$studentId': typeof dashboardDashboardStudentsStudentIdRoute
+  '/dashboard/students/create': typeof dashboardDashboardStudentsCreateRoute
   '/dashboard/studio/$contentId': typeof dashboardDashboardStudioContentIdRoute
   '/dashboard/studio/create': typeof dashboardDashboardStudioCreateRoute
+  '/dashboard/students': typeof dashboardDashboardStudentsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -142,14 +177,18 @@ export interface FileRoutesById {
   '/(auth)/reset-password': typeof authResetPasswordRoute
   '/(dashboard)/dashboard': typeof dashboardDashboardRouteWithChildren
   '/(dashboard)/dashboard/analytics': typeof dashboardDashboardAnalyticsRoute
+  '/(dashboard)/dashboard/assignments': typeof dashboardDashboardAssignmentsRoute
   '/(dashboard)/dashboard/community': typeof dashboardDashboardCommunityRoute
   '/(dashboard)/dashboard/settings': typeof dashboardDashboardSettingsRoute
   '/(dashboard)/dashboard/studio': typeof dashboardDashboardStudioRoute
   '/(dashboard)/dashboard/': typeof dashboardDashboardIndexRoute
   '/(dashboard)/dashboard/community_/subscription-create': typeof dashboardDashboardCommunitySubscriptionCreateRoute
   '/(dashboard)/dashboard/community_/subscription-edit': typeof dashboardDashboardCommunitySubscriptionEditRoute
+  '/(dashboard)/dashboard/students/$studentId': typeof dashboardDashboardStudentsStudentIdRoute
+  '/(dashboard)/dashboard/students/create': typeof dashboardDashboardStudentsCreateRoute
   '/(dashboard)/dashboard/studio_/$contentId': typeof dashboardDashboardStudioContentIdRoute
   '/(dashboard)/dashboard/studio_/create': typeof dashboardDashboardStudioCreateRoute
+  '/(dashboard)/dashboard/students/': typeof dashboardDashboardStudentsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -160,14 +199,18 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/dashboard'
     | '/dashboard/analytics'
+    | '/dashboard/assignments'
     | '/dashboard/community'
     | '/dashboard/settings'
     | '/dashboard/studio'
     | '/dashboard/'
     | '/dashboard/community/subscription-create'
     | '/dashboard/community/subscription-edit'
+    | '/dashboard/students/$studentId'
+    | '/dashboard/students/create'
     | '/dashboard/studio/$contentId'
     | '/dashboard/studio/create'
+    | '/dashboard/students/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -175,14 +218,18 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/dashboard/analytics'
+    | '/dashboard/assignments'
     | '/dashboard/community'
     | '/dashboard/settings'
     | '/dashboard/studio'
     | '/dashboard'
     | '/dashboard/community/subscription-create'
     | '/dashboard/community/subscription-edit'
+    | '/dashboard/students/$studentId'
+    | '/dashboard/students/create'
     | '/dashboard/studio/$contentId'
     | '/dashboard/studio/create'
+    | '/dashboard/students'
   id:
     | '__root__'
     | '/'
@@ -191,14 +238,18 @@ export interface FileRouteTypes {
     | '/(auth)/reset-password'
     | '/(dashboard)/dashboard'
     | '/(dashboard)/dashboard/analytics'
+    | '/(dashboard)/dashboard/assignments'
     | '/(dashboard)/dashboard/community'
     | '/(dashboard)/dashboard/settings'
     | '/(dashboard)/dashboard/studio'
     | '/(dashboard)/dashboard/'
     | '/(dashboard)/dashboard/community_/subscription-create'
     | '/(dashboard)/dashboard/community_/subscription-edit'
+    | '/(dashboard)/dashboard/students/$studentId'
+    | '/(dashboard)/dashboard/students/create'
     | '/(dashboard)/dashboard/studio_/$contentId'
     | '/(dashboard)/dashboard/studio_/create'
+    | '/(dashboard)/dashboard/students/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -281,6 +332,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof dashboardDashboardAnalyticsRouteImport
       parentRoute: typeof dashboardDashboardRoute
     }
+    '/(dashboard)/dashboard/assignments': {
+      id: '/(dashboard)/dashboard/assignments'
+      path: '/assignments'
+      fullPath: '/dashboard/assignments'
+      preLoaderRoute: typeof dashboardDashboardAssignmentsRouteImport
+      parentRoute: typeof dashboardDashboardRoute
+    }
+    '/(dashboard)/dashboard/students/': {
+      id: '/(dashboard)/dashboard/students/'
+      path: '/students'
+      fullPath: '/dashboard/students/'
+      preLoaderRoute: typeof dashboardDashboardStudentsIndexRouteImport
+      parentRoute: typeof dashboardDashboardRoute
+    }
     '/(dashboard)/dashboard/studio_/create': {
       id: '/(dashboard)/dashboard/studio_/create'
       path: '/studio/create'
@@ -293,6 +358,20 @@ declare module '@tanstack/react-router' {
       path: '/studio/$contentId'
       fullPath: '/dashboard/studio/$contentId'
       preLoaderRoute: typeof dashboardDashboardStudioContentIdRouteImport
+      parentRoute: typeof dashboardDashboardRoute
+    }
+    '/(dashboard)/dashboard/students/create': {
+      id: '/(dashboard)/dashboard/students/create'
+      path: '/students/create'
+      fullPath: '/dashboard/students/create'
+      preLoaderRoute: typeof dashboardDashboardStudentsCreateRouteImport
+      parentRoute: typeof dashboardDashboardRoute
+    }
+    '/(dashboard)/dashboard/students/$studentId': {
+      id: '/(dashboard)/dashboard/students/$studentId'
+      path: '/students/$studentId'
+      fullPath: '/dashboard/students/$studentId'
+      preLoaderRoute: typeof dashboardDashboardStudentsStudentIdRouteImport
       parentRoute: typeof dashboardDashboardRoute
     }
     '/(dashboard)/dashboard/community_/subscription-edit': {
@@ -314,18 +393,23 @@ declare module '@tanstack/react-router' {
 
 interface dashboardDashboardRouteChildren {
   dashboardDashboardAnalyticsRoute: typeof dashboardDashboardAnalyticsRoute
+  dashboardDashboardAssignmentsRoute: typeof dashboardDashboardAssignmentsRoute
   dashboardDashboardCommunityRoute: typeof dashboardDashboardCommunityRoute
   dashboardDashboardSettingsRoute: typeof dashboardDashboardSettingsRoute
   dashboardDashboardStudioRoute: typeof dashboardDashboardStudioRoute
   dashboardDashboardIndexRoute: typeof dashboardDashboardIndexRoute
   dashboardDashboardCommunitySubscriptionCreateRoute: typeof dashboardDashboardCommunitySubscriptionCreateRoute
   dashboardDashboardCommunitySubscriptionEditRoute: typeof dashboardDashboardCommunitySubscriptionEditRoute
+  dashboardDashboardStudentsStudentIdRoute: typeof dashboardDashboardStudentsStudentIdRoute
+  dashboardDashboardStudentsCreateRoute: typeof dashboardDashboardStudentsCreateRoute
   dashboardDashboardStudioContentIdRoute: typeof dashboardDashboardStudioContentIdRoute
   dashboardDashboardStudioCreateRoute: typeof dashboardDashboardStudioCreateRoute
+  dashboardDashboardStudentsIndexRoute: typeof dashboardDashboardStudentsIndexRoute
 }
 
 const dashboardDashboardRouteChildren: dashboardDashboardRouteChildren = {
   dashboardDashboardAnalyticsRoute: dashboardDashboardAnalyticsRoute,
+  dashboardDashboardAssignmentsRoute: dashboardDashboardAssignmentsRoute,
   dashboardDashboardCommunityRoute: dashboardDashboardCommunityRoute,
   dashboardDashboardSettingsRoute: dashboardDashboardSettingsRoute,
   dashboardDashboardStudioRoute: dashboardDashboardStudioRoute,
@@ -334,9 +418,13 @@ const dashboardDashboardRouteChildren: dashboardDashboardRouteChildren = {
     dashboardDashboardCommunitySubscriptionCreateRoute,
   dashboardDashboardCommunitySubscriptionEditRoute:
     dashboardDashboardCommunitySubscriptionEditRoute,
+  dashboardDashboardStudentsStudentIdRoute:
+    dashboardDashboardStudentsStudentIdRoute,
+  dashboardDashboardStudentsCreateRoute: dashboardDashboardStudentsCreateRoute,
   dashboardDashboardStudioContentIdRoute:
     dashboardDashboardStudioContentIdRoute,
   dashboardDashboardStudioCreateRoute: dashboardDashboardStudioCreateRoute,
+  dashboardDashboardStudentsIndexRoute: dashboardDashboardStudentsIndexRoute,
 }
 
 const dashboardDashboardRouteWithChildren =
