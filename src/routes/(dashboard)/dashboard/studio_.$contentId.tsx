@@ -14,6 +14,7 @@ import {
   Video,
   FileText,
   Download,
+  Users,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -25,6 +26,8 @@ import type { Content, ContentMedia } from '@/lib/types'
 import { getContentStatusLabel } from '@/hooks/use-studio'
 import { VideoPlayer } from '@/components/video-player'
 import { useContentDetail } from '@/hooks/use-content-detail'
+import { AssignContentFromDetailSheet } from '@/components/students/assign-content-from-detail-sheet'
+import { useContentAssignments } from '@/hooks/use-assignments'
 
 // ─── Route ──────────────────────────────────────────────────────────────
 
@@ -65,6 +68,8 @@ function ContentDetailPage() {
     'sections',
   )
   const [playingVideo, setPlayingVideo] = useState<ContentMedia | null>(null)
+  const [assignSheetOpen, setAssignSheetOpen] = useState(false)
+  const { data: assignedData } = useContentAssignments(contentId)
 
   const toggleSection = (id: string) => {
     setOpenSections((prev) => {
@@ -174,6 +179,10 @@ function ContentDetailPage() {
         <Button size="sm" variant="outline" onClick={handleEdit}>
           <Pencil className="h-3.5 w-3.5" />
           Edit
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => setAssignSheetOpen(true)}>
+          <Users className="h-3.5 w-3.5" />
+          Assign to Students
         </Button>
         <Button size="sm" variant="outline" onClick={handleTogglePublish}>
           {content.status === ContentStatus.PUBLISHED ? (
@@ -467,6 +476,48 @@ function ContentDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Assigned Students */}
+      {assignedData && assignedData.assignments.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-lg font-semibold text-white">
+            Assigned Students ({assignedData.assignments.length})
+          </h2>
+          <div className="space-y-2">
+            {assignedData.assignments.map((assignment) => (
+              <div
+                key={assignment.id}
+                className="flex items-center gap-4 rounded-xl border border-white/12 bg-white/5 px-4 py-3"
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-white/90">
+                    {assignment.student?.uniqueId ?? assignment.studentId}{' '}
+                    {assignment.student?.fullName ?? ''}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="h-2 w-24 rounded-full bg-white/10">
+                    <div
+                      className="h-full rounded-full bg-blue-500 transition-all"
+                      style={{ width: `${assignment.progress}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-white/50 w-8 text-right">
+                    {assignment.progress}%
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <AssignContentFromDetailSheet
+        contentId={contentId}
+        contentTitle={content.title}
+        open={assignSheetOpen}
+        onOpenChange={setAssignSheetOpen}
+      />
     </div>
   )
 }
