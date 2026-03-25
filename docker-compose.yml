@@ -1,0 +1,22 @@
+services:
+  performa-studio:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: performa-studio
+    restart: unless-stopped
+    environment:
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:3000/api}
+      - SERVER_API_URL=${SERVER_API_URL:-http://performa-edu-api-gateway:3000/api}
+    ports:
+      - "${STUDIO_PORT:-3001}:3000"
+    volumes:
+      - ./src:/app/src:ro
+      - ./public:/app/public:ro
+    networks:
+      - performa-network
+
+networks:
+  performa-network:
+    external: true
