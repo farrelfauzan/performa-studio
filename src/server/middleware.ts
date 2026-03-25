@@ -7,11 +7,21 @@ import { getCookie } from '@tanstack/react-start/server'
  */
 export const authMiddleware = createMiddleware({ type: 'function' }).server(
   async ({ next }) => {
-    const accessToken = getCookie('accessToken')
+    let accessToken: string | null = null
+
+    const tokensStr = getCookie('auth_tokens')
+    if (tokensStr) {
+      try {
+        const tokens = JSON.parse(tokensStr)
+        accessToken = tokens.accessToken ?? null
+      } catch {
+        // ignore malformed cookie
+      }
+    }
 
     return next({
       context: {
-        accessToken: accessToken ?? null,
+        accessToken,
       },
     })
   },

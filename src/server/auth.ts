@@ -4,7 +4,10 @@ import { redirect } from '@tanstack/react-router'
 import { z } from 'zod'
 import { authMiddleware } from './middleware'
 
-const API_URL = process.env.VITE_API_URL || 'http://localhost:3000/api'
+const API_URL =
+  process.env.SERVER_API_URL ||
+  process.env.VITE_API_URL ||
+  'http://localhost:3000/api'
 
 // ─── Types ──────────────────────────────────────────────────────────────
 export type SessionUser = {
@@ -77,6 +80,8 @@ export const loginFn = createServerFn({ method: 'POST' })
         }),
       })
 
+      console.log('Login response status:', res)
+
       if (!res.ok) {
         const error = await res.json().catch(() => null)
         return {
@@ -103,6 +108,8 @@ export const loginFn = createServerFn({ method: 'POST' })
 
       const { accessToken, refreshToken, user: loginUser } = json.data
 
+      console.log('Access Token:', accessToken)
+
       // Store tokens in httpOnly cookies (7 days)
       const cookieOpts = {
         httpOnly: true,
@@ -112,8 +119,11 @@ export const loginFn = createServerFn({ method: 'POST' })
         path: '/',
       }
 
-      setCookie('accessToken', accessToken, cookieOpts)
-      setCookie('refreshToken', refreshToken, cookieOpts)
+      setCookie(
+        'auth_tokens',
+        JSON.stringify({ accessToken, refreshToken }),
+        cookieOpts,
+      )
 
       // Fetch full profile
       const profileRes = await fetch(`${API_URL}/v1/auth/getMe`, {
@@ -162,8 +172,7 @@ export const loginFn = createServerFn({ method: 'POST' })
 
 /** Logout — clear session cookies */
 export const logoutFn = createServerFn({ method: 'POST' }).handler(async () => {
-  deleteCookie('accessToken')
-  deleteCookie('refreshToken')
+  deleteCookie('auth_tokens')
 })
 
 /** Request a password reset token for the given email */
