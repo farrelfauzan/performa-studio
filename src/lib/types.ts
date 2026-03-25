@@ -264,3 +264,107 @@ export type UpdateContentResponse = {
 export type DeleteContentResponse = {
   data: { success: boolean }
 }
+
+// ─── Student Types ──────────────────────────────────────────────────────
+
+export type Student = {
+  id: string
+  userId: string
+  uniqueId: string
+  fullName: string
+  phoneNumber: string | null
+  dateOfBirth: string | null
+  profilePictureUrl: string | null
+  bio: string | null
+  active: 'ACTIVE' | 'INACTIVE'
+  createdAt: string
+  updatedAt: string
+}
+
+export type CreateStudentPayload = {
+  username: string
+  email: string
+  password: string
+  fullName: string
+  phoneNumber?: string
+  dateOfBirth?: string
+  profilePictureUrl?: string
+}
+
+export type UpdateStudentPayload = {
+  fullName?: string
+  phoneNumber?: string
+  dateOfBirth?: string
+  active?: 'ACTIVE' | 'INACTIVE'
+}
+
+export type StudentListResponse = PaginatedResponse<Student>
+
+export type StudentResponse = {
+  data: Student
+}
+
+// ─── Assignment Types ───────────────────────────────────────────────────
+
+export type AssignmentStatus =
+  | 'ASSIGNED'
+  | 'IN_PROGRESS'
+  | 'COMPLETED'
+  | 'OVERDUE'
+
+export type Assignment = {
+  id: string
+  teacherId: string
+  studentId: string
+  contentId: string
+  status: AssignmentStatus
+  progress: number
+  dueDate: string | null
+  assignedAt: string
+  startedAt: string | null
+  completedAt: string | null
+  student?: Student
+  content?: Content
+  createdAt: string
+  updatedAt: string
+}
+
+export type CreateAssignmentPayload = {
+  studentId: string
+  contentId: string
+  dueDate?: string
+}
+
+export type BulkCreateAssignmentPayload = {
+  studentIds: string[]
+  contentId: string
+  dueDate?: string
+}
+
+export type AssignmentListResponse = PaginatedResponse<Assignment>
+
+export type BulkAssignmentResponse = {
+  data: {
+    assignments: Assignment[]
+    created: number
+    skipped: number
+  }
+}
+
+export type ProgressLog = {
+  id: string
+  assignmentId: string
+  sectionId: string | null
+  questionId: string | null
+  action: 'COMPLETE_SECTION' | 'ANSWER_QUESTION'
+  createdAt: string
+}
+
+export type ProgressLogsResponse = {
+  data: {
+    logs: ProgressLog[]
+    progress: number
+    completedItems: number
+    totalItems: number
+  }
+}
