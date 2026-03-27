@@ -1,18 +1,29 @@
 import { useState } from 'react'
 import { useForm } from '@tanstack/react-form'
-import { Search, Check } from 'lucide-react'
+import { Search, Check, Loader2 } from 'lucide-react'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
 import { Field, FieldError } from '@/components/ui/field'
+import { Card, CardContent } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+import { Skeleton } from '@/components/ui/skeleton'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from '@/components/ui/input-group'
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
+import { Toggle } from '@/components/ui/toggle'
 import { useStudioProjects } from '@/hooks/use-studio'
 import {
   useStudentAssignments,
@@ -38,7 +49,7 @@ export function AssignContentSheet({
 }: AssignContentSheetProps) {
   const [search, setSearch] = useState('')
 
-  const { data: contentsData } = useStudioProjects({
+  const { data: contentsData, isLoading: contentsLoading } = useStudioProjects({
     search: search || undefined,
     pageSize: 50,
   })
@@ -74,12 +85,15 @@ export function AssignContentSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-[480px] flex flex-col">
+      <SheetContent className="w-120 flex flex-col">
         <SheetHeader>
-          <SheetTitle className="text-white">
-            Assign Content to {studentName}
-          </SheetTitle>
+          <SheetTitle>Assign Content</SheetTitle>
+          <SheetDescription>
+            Select content to assign to {studentName}
+          </SheetDescription>
         </SheetHeader>
+
+        <Separator />
 
         <form
           onSubmit={(e) => {
@@ -90,15 +104,18 @@ export function AssignContentSheet({
           className="flex flex-1 flex-col overflow-hidden"
         >
           <div className="flex-1 space-y-4 overflow-y-auto py-4 px-6">
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
-              <Input
+            <InputGroup>
+              <InputGroupAddon align="inline-start">
+                <InputGroupText>
+                  <Search />
+                </InputGroupText>
+              </InputGroupAddon>
+              <InputGroupInput
                 placeholder="Search content..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-9"
               />
-            </div>
+            </InputGroup>
 
             <form.Field
               name="contentId"
@@ -108,57 +125,73 @@ export function AssignContentSheet({
             >
               {(field) => (
                 <Field data-invalid={field.state.meta.errors.length > 0}>
+                  <Label>Select Content</Label>
                   <div className="space-y-2">
-                    {contentsData?.projects.map((content: Content) => {
-                      const isAssigned = alreadyAssigned.has(content.id)
-                      const isSelected = field.state.value === content.id
+                    {contentsLoading ? (
+                      Array.from({ length: 4 }).map((_, i) => (
+                        <Card key={i} size="sm" className="animate-pulse">
+                          <CardContent className="flex items-center gap-3">
+                            <Skeleton className="h-5 w-5 rounded" />
+                            <div className="flex-1 space-y-1.5">
+                              <Skeleton className="h-4 w-3/4" />
+                              <Skeleton className="h-3 w-1/3" />
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))
+                    ) : (contentsData?.projects.length ?? 0) === 0 ? (
+                      <Card size="sm">
+                        <CardContent>
+                          <p className="py-6 text-center text-sm text-muted-foreground">
+                            No content found
+                          </p>
+                        </CardContent>
+                      </Card>
+                    ) : (
+                      contentsData?.projects.map((content: Content) => {
+                        const isAssigned = alreadyAssigned.has(content.id)
+                        const isSelected = field.state.value === content.id
 
-                      return (
-                        <button
-                          key={content.id}
-                          type="button"
-                          disabled={isAssigned}
-                          onClick={() =>
-                            field.handleChange(
-                              isSelected ? '' : content.id,
-                            )
-                          }
-                          className={`flex w-full items-center gap-3 rounded-lg p-3 text-left transition-colors ${
-                            isAssigned
-                              ? 'opacity-50 cursor-not-allowed bg-white/3'
-                              : isSelected
-                                ? 'bg-blue-500/15 ring-1 ring-blue-500/30'
-                                : 'bg-white/5 hover:bg-white/8'
-                          }`}
-                        >
-                          <div
-                            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border ${
-                              isAssigned || isSelected
-                                ? 'border-blue-500 bg-blue-500'
-                                : 'border-white/20'
-                            }`}
+                        return (
+                          <Toggle
+                            key={content.id}
+                            variant="outline"
+                            pressed={isSelected}
+                            disabled={isAssigned}
+                            onPressedChange={() =>
+                              field.handleChange(
+                                isSelected ? '' : content.id,
+                              )
+                            }
+                            className="flex h-auto w-full items-center justify-start gap-3 rounded-xl p-3"
                           >
-                            {(isAssigned || isSelected) && (
-                              <Check className="h-3 w-3 text-white" />
+                            <div
+                              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors ${
+                                isAssigned || isSelected
+                                  ? 'border-primary bg-primary'
+                                  : 'border-muted-foreground/30'
+                              }`}
+                            >
+                              {(isAssigned || isSelected) && (
+                                <Check className="h-3 w-3 text-primary-foreground" />
+                              )}
+                            </div>
+                            <div className="min-w-0 flex-1 text-left">
+                              <p className="text-sm font-medium truncate">
+                                {content.title}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {content.sections?.length ?? 0} sections
+                              </p>
+                            </div>
+                            {isAssigned && (
+                              <Badge variant="secondary" className="shrink-0 text-[10px]">
+                                Assigned
+                              </Badge>
                             )}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium text-white/90 truncate">
-                              {content.title}
-                            </p>
-                            <p className="text-xs text-white/40">
-                              {content.sections?.length ?? 0} sections
-                              {isAssigned && ' (already assigned)'}
-                            </p>
-                          </div>
-                        </button>
-                      )
-                    })}
-
-                    {(contentsData?.projects.length ?? 0) === 0 && (
-                      <p className="py-8 text-center text-sm text-white/30">
-                        No content found
-                      </p>
+                          </Toggle>
+                        )
+                      })
                     )}
                   </div>
                   {field.state.meta.isTouched &&
@@ -169,22 +202,28 @@ export function AssignContentSheet({
               )}
             </form.Field>
 
+            <Separator />
+
             <form.Field name="dueDate">
               {(field) => (
                 <Field>
-                  <Label className="text-white/70">Due Date (optional)</Label>
-                  <Input
-                    type="date"
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    onBlur={field.handleBlur}
-                  />
+                  <Label>Due Date (optional)</Label>
+                  <InputGroup>
+                    <InputGroupInput
+                      type="date"
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      onBlur={field.handleBlur}
+                    />
+                  </InputGroup>
                 </Field>
               )}
             </form.Field>
           </div>
 
-          <SheetFooter className="px-6 pb-6">
+          <Separator />
+
+          <SheetFooter>
             <Button
               type="button"
               variant="outline"
@@ -205,6 +244,9 @@ export function AssignContentSheet({
                     isPending
                   }
                 >
+                  {(isSubmitting || isPending) && (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  )}
                   {isSubmitting || isPending ? 'Assigning...' : 'Assign'}
                 </Button>
               )}

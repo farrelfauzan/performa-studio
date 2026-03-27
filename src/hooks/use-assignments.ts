@@ -54,7 +54,7 @@ export function useContentAssignments(contentId: string) {
     async () => {
       const result = await assignmentApi.getContentAssignments(contentId)
       return {
-        assignments: result.data,
+        assignments: result.data ?? [],
         meta: result.meta,
       }
     },

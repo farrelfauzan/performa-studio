@@ -31,11 +31,12 @@ export function useStudioProjects(params?: {
 // ─── Helpers ─────────────────────────────────────────────────────────────
 
 const STATUS_MAP: Record<ContentStatus, string> = {
-  0: 'draft',
-  1: 'published',
-  2: 'archived',
+  0: 'Draft',
+  1: 'Published',
+  2: 'Archived',
+  3: 'Waiting Review',
 }
 
 export function getContentStatusLabel(status: ContentStatus): string {
-  return STATUS_MAP[status] ?? 'draft'
+  return STATUS_MAP[status] ?? 'Draft'
 }

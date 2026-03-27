@@ -169,6 +169,7 @@ function StudioPage() {
           onSearchChange={setSearch}
           totalItems={data?.meta?.itemCount}
           renderItem={(project) => {
+            console.log("status", project)
             const statusLabel = getContentStatusLabel(project.status)
             return (
               <div className="group rounded-2xl border border-white/12 bg-white/5 backdrop-blur-xl p-5 transition-colors hover:bg-white/8 cursor-pointer">

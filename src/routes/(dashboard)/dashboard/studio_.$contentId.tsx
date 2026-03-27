@@ -22,7 +22,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { contentApi } from '@/lib/api'
 import { ContentStatus } from '@/lib/types'
-import type { Content, ContentMedia } from '@/lib/types'
+import type { ContentMedia } from '@/lib/types'
 import { getContentStatusLabel } from '@/hooks/use-studio'
 import { VideoPlayer } from '@/components/video-player'
 import { useContentDetail } from '@/hooks/use-content-detail'
@@ -111,14 +111,12 @@ function ContentDetailPage() {
   const statusLabel = getContentStatusLabel(content.status)
 
   const totalVideos = sections.reduce(
-    (sum, s) =>
-      sum + (s.medias?.filter((m) => m.mediaType !== 2).length ?? 0),
+    (sum, s) => sum + (s.medias?.filter((m) => m.mediaType !== 2).length ?? 0),
     0,
   )
 
   const totalDocuments = sections.reduce(
-    (sum, s) =>
-      sum + (s.medias?.filter((m) => m.mediaType === 2).length ?? 0),
+    (sum, s) => sum + (s.medias?.filter((m) => m.mediaType === 2).length ?? 0),
     0,
   )
 
@@ -180,7 +178,11 @@ function ContentDetailPage() {
           <Pencil className="h-3.5 w-3.5" />
           Edit
         </Button>
-        <Button size="sm" variant="outline" onClick={() => setAssignSheetOpen(true)}>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setAssignSheetOpen(true)}
+        >
           <Users className="h-3.5 w-3.5" />
           Assign to Students
         </Button>
@@ -216,15 +218,16 @@ function ContentDetailPage() {
             <CardContent className="space-y-3">
               {content.previewUrl && (
                 <div className="space-y-1.5">
-                  <p className="text-xs font-medium text-white/50">Preview Video</p>
+                  <p className="text-xs font-medium text-white/50">
+                    Preview Video
+                  </p>
                   <VideoPlayer src={content.previewUrl} />
                 </div>
               )}
               <div className="flex items-center gap-2 text-sm text-white/60">
                 <Calendar className="h-3.5 w-3.5" />
                 <span>
-                  Created{' '}
-                  {new Date(content.createdAt).toLocaleDateString()}
+                  Created {new Date(content.createdAt).toLocaleDateString()}
                 </span>
               </div>
               {content.year && (
@@ -381,24 +384,40 @@ function ContentDetailPage() {
                               onClick={() => m.hlsUrl && setPlayingVideo(m)}
                               className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-white/3 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              <div className={`flex h-7 w-7 items-center justify-center rounded-full ${
-                                playingVideo?.id === m.id ? 'bg-green-500/20' : 'bg-white/8'
-                              }`}>
-                                <Play className={`h-3 w-3 ${
-                                  playingVideo?.id === m.id ? 'text-green-400' : 'text-white/50'
-                                }`} />
+                              <div
+                                className={`flex h-7 w-7 items-center justify-center rounded-full ${
+                                  playingVideo?.id === m.id
+                                    ? 'bg-green-500/20'
+                                    : 'bg-white/8'
+                                }`}
+                              >
+                                <Play
+                                  className={`h-3 w-3 ${
+                                    playingVideo?.id === m.id
+                                      ? 'text-green-400'
+                                      : 'text-white/50'
+                                  }`}
+                                />
                               </div>
                               <span className="text-xs text-white/30 w-5">
                                 {vIdx + 1}.
                               </span>
-                              <span className={`flex-1 text-sm ${
-                                playingVideo?.id === m.id ? 'text-white' : 'text-white/70'
-                              }`}>
+                              <span
+                                className={`flex-1 text-sm ${
+                                  playingVideo?.id === m.id
+                                    ? 'text-white'
+                                    : 'text-white/70'
+                                }`}
+                              >
                                 {m.title ?? m.fileName}
                               </span>
-                              <span className={`text-xs ${
-                                m.hlsUrl ? 'text-green-400/60' : 'text-white/30'
-                              }`}>
+                              <span
+                                className={`text-xs ${
+                                  m.hlsUrl
+                                    ? 'text-green-400/60'
+                                    : 'text-white/30'
+                                }`}
+                              >
                                 {m.hlsUrl ? 'Ready' : 'Processing'}
                               </span>
                             </button>
@@ -478,13 +497,13 @@ function ContentDetailPage() {
       </div>
 
       {/* Assigned Students */}
-      {assignedData && assignedData.assignments.length > 0 && (
+      {assignedData?.assignments && assignedData.assignments.length > 0 && (
         <div className="space-y-3">
           <h2 className="text-lg font-semibold text-white">
-            Assigned Students ({assignedData.assignments.length})
+            Assigned Students ({assignedData?.assignments?.length ?? 0})
           </h2>
           <div className="space-y-2">
-            {assignedData.assignments.map((assignment) => (
+            {assignedData?.assignments && assignedData?.assignments?.map((assignment) => (
               <div
                 key={assignment.id}
                 className="flex items-center gap-4 rounded-xl border border-white/12 bg-white/5 px-4 py-3"
