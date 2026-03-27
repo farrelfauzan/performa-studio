@@ -5,6 +5,16 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Hide number input spinners */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
 :root {
   --background: #f8f9fc;
   --foreground: #1a1d2e;
@@ -142,4 +152,53 @@
 
 .animate-sparkle {
   animation: sparkle ease-in-out infinite;
+}
+
+/* Plyr: volume slider as horizontal popup above mute button */
+.plyr .plyr__volume {
+  position: relative;
+  min-width: auto;
+  width: auto;
+}
+
+/* Extend hover zone upward so cursor can reach the popup */
+.plyr .plyr__volume::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 20px;
+  pointer-events: none;
+}
+
+.plyr .plyr__volume:hover::before,
+.plyr .plyr__volume:focus-within::before {
+  pointer-events: auto;
+}
+
+.plyr .plyr__volume input[type='range'] {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: auto;
+  opacity: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 6px 8px;
+  background: var(--plyr-menu-background, #ffffffe6);
+  border-radius: var(--plyr-menu-radius, 8px);
+  box-shadow: var(--plyr-menu-shadow, 0 1px 2px #00000026);
+  transition: width 0.2s ease, opacity 0.2s ease, padding 0.2s ease;
+  pointer-events: none;
+}
+
+.plyr .plyr__volume:hover input[type='range'],
+.plyr .plyr__volume:focus-within input[type='range'] {
+  width: 100px;
+  opacity: 1;
+  pointer-events: auto;
 }
