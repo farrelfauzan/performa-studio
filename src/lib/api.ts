@@ -26,6 +26,16 @@ import type {
   BulkCreateAssignmentPayload,
   CreateAssignmentPayload,
   ProgressLogsResponse,
+  QuizListResponse,
+  QuizResponse,
+  CreateQuizPayload,
+  UpdateQuizPayload,
+  AddQuestionPayload,
+  UpdateQuestionPayload,
+  QuestionResponse,
+  QuizAnalyticsResponse,
+  AttemptHistoryResponse,
+  QuestionPictureUploadUrlResponse,
 } from './types'
 
 // ─── Auth API ────────────────────────────────────────────────────────────
@@ -171,6 +181,88 @@ export const assignmentApi = {
   getProgressLogs: (studentId: string, contentId: string) =>
     apiClient.get<ProgressLogsResponse>(
       `/v1/assignments/${encodeURIComponent(studentId)}/${encodeURIComponent(contentId)}/progress`,
+    ),
+}
+
+// ─── Quiz API ────────────────────────────────────────────────────────────
+
+export const quizApi = {
+  getAll: (params?: PageParams & { isPublished?: boolean }) =>
+    apiClient.get<QuizListResponse>('/v1/quizzes', { params }),
+
+  getById: (id: string) =>
+    apiClient.get<QuizResponse>(`/v1/quizzes/${encodeURIComponent(id)}`),
+
+  create: (data: CreateQuizPayload) =>
+    apiClient.post<QuizResponse>('/v1/quizzes', data),
+
+  update: (id: string, data: UpdateQuizPayload) =>
+    apiClient.put<QuizResponse>(`/v1/quizzes/${encodeURIComponent(id)}`, data),
+
+  delete: (id: string) =>
+    apiClient.delete(`/v1/quizzes/${encodeURIComponent(id)}`),
+
+  publish: (id: string) =>
+    apiClient.post<QuizResponse>(
+      `/v1/quizzes/${encodeURIComponent(id)}/publish`,
+    ),
+
+  unpublish: (id: string) =>
+    apiClient.post<QuizResponse>(
+      `/v1/quizzes/${encodeURIComponent(id)}/unpublish`,
+    ),
+
+  // Questions
+  addQuestion: (quizId: string, data: AddQuestionPayload) =>
+    apiClient.post<QuestionResponse>(
+      `/v1/quizzes/${encodeURIComponent(quizId)}/questions`,
+      data,
+    ),
+
+  getQuestionPictureUploadUrl: (
+    quizId: string,
+    questionId: string,
+    data: { filename: string; contentType: string },
+  ) =>
+    apiClient.post<QuestionPictureUploadUrlResponse>(
+      `/v1/quizzes/${encodeURIComponent(quizId)}/questions/${encodeURIComponent(questionId)}/upload-url`,
+      data,
+    ),
+
+  updateQuestion: (
+    quizId: string,
+    questionId: string,
+    data: UpdateQuestionPayload,
+  ) =>
+    apiClient.put<QuestionResponse>(
+      `/v1/quizzes/${encodeURIComponent(quizId)}/questions/${encodeURIComponent(questionId)}`,
+      data,
+    ),
+
+  deleteQuestion: (quizId: string, questionId: string) =>
+    apiClient.delete(
+      `/v1/quizzes/${encodeURIComponent(quizId)}/questions/${encodeURIComponent(questionId)}`,
+    ),
+
+  reorderQuestions: (quizId: string, questionIds: string[]) =>
+    apiClient.post(
+      `/v1/quizzes/${encodeURIComponent(quizId)}/questions/reorder`,
+      { questionIds },
+    ),
+
+  // Analytics
+  getAnalytics: (quizId: string) =>
+    apiClient.get<QuizAnalyticsResponse>(
+      `/v1/quizzes/${encodeURIComponent(quizId)}/analytics`,
+    ),
+
+  getAttemptHistory: (
+    quizId: string,
+    params?: { userId?: string; page?: number; pageSize?: number },
+  ) =>
+    apiClient.get<AttemptHistoryResponse>(
+      `/v1/quizzes/${encodeURIComponent(quizId)}/attempts`,
+      { params },
     ),
 }
 

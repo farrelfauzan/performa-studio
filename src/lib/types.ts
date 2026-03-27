@@ -368,3 +368,163 @@ export type ProgressLogsResponse = {
     totalItems: number
   }
 }
+
+// ─── Quiz Types ─────────────────────────────────────────────────────────
+
+export enum QuestionType {
+  MULTIPLE_CHOICE = 0,
+  TRUE_FALSE = 1,
+  SHORT_ANSWER = 2,
+  MULTI_SELECT = 3,
+}
+
+export enum AttemptStatus {
+  IN_PROGRESS = 0,
+  SUBMITTED = 1,
+  GRADED = 2,
+  TIMED_OUT = 3,
+}
+
+export type QuestionOption = {
+  id: string
+  text: string
+  isCorrect: boolean
+  sortOrder: number
+}
+
+export type Question = {
+  id: string
+  quizId: string
+  type: QuestionType
+  text: string
+  explanation?: string
+  pictureUrl?: string
+  points: number
+  sortOrder: number
+  options: QuestionOption[]
+  createdAt: string
+  updatedAt: string
+}
+
+export type Quiz = {
+  id: string
+  userId: string
+  title: string
+  description?: string
+  timeLimitSecs?: number
+  passingScore: number
+  maxAttempts: number
+  shuffleQuestions: boolean
+  isPublished: boolean
+  questionCount: number
+  questions: Question[]
+  createdAt: string
+  updatedAt: string
+}
+
+export type CreateQuizPayload = {
+  title: string
+  description?: string
+  timeLimitSecs?: number
+  passingScore?: number
+  maxAttempts?: number
+  shuffleQuestions?: boolean
+  questions?: CreateQuestionInput[]
+}
+
+export type CreateQuestionInput = {
+  type: QuestionType
+  text: string
+  explanation?: string
+  pictureUrl?: string
+  points?: number
+  sortOrder?: number
+  options: CreateOptionInput[]
+}
+
+export type CreateOptionInput = {
+  text: string
+  isCorrect: boolean
+  sortOrder?: number
+}
+
+export type UpdateQuizPayload = {
+  title?: string
+  description?: string
+  timeLimitSecs?: number | null
+  passingScore?: number
+  maxAttempts?: number
+  shuffleQuestions?: boolean
+  clearTimeLimit?: boolean
+}
+
+export type AddQuestionPayload = {
+  type: QuestionType
+  text: string
+  explanation?: string
+  pictureUrl?: string
+  points?: number
+  sortOrder?: number
+  options: CreateOptionInput[]
+}
+
+export type UpdateQuestionPayload = {
+  type?: QuestionType
+  text?: string
+  explanation?: string
+  pictureUrl?: string | null
+  points?: number
+  options?: CreateOptionInput[]
+}
+
+export type QuizListResponse = PaginatedResponse<Quiz>
+
+export type QuizResponse = {
+  data: Quiz
+}
+
+export type QuestionResponse = {
+  data: Question
+}
+
+export type QuizAttempt = {
+  id: string
+  quizId: string
+  userId: string
+  score?: number
+  totalPoints?: number
+  status: AttemptStatus
+  startedAt: string
+  submittedAt?: string
+}
+
+export type QuestionStat = {
+  questionId: string
+  text: string
+  correctRate: number
+  averagePoints: number
+}
+
+export type QuizAnalytics = {
+  quizId: string
+  totalAttempts: number
+  averageScore: number
+  passRate: number
+  questionStats: QuestionStat[]
+}
+
+export type QuizAnalyticsResponse = {
+  data: QuizAnalytics
+}
+
+export type AttemptHistoryResponse = PaginatedResponse<QuizAttempt>
+
+export type QuestionPictureUploadUrlResponse = {
+  data: {
+    uploadUrl: string
+    fields: Record<string, string>
+    s3Key: string
+    publicUrl: string
+    expiresIn: number
+  }
+}
