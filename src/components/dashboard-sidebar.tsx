@@ -9,6 +9,7 @@ import {
   ChevronsUpDown,
   GraduationCap,
   ClipboardList,
+  FileQuestion,
 } from 'lucide-react'
 import { logoutFn } from '@/server/auth'
 import { useAuthStore } from '@/stores/auth-store'
@@ -55,6 +56,11 @@ const sidebarItems = [
     label: 'Assignments',
     to: '/dashboard/assignments',
     icon: ClipboardList,
+  },
+  {
+    label: 'Quizzes',
+    to: '/dashboard/quizzes',
+    icon: FileQuestion,
   },
   {
     label: 'Analytics',

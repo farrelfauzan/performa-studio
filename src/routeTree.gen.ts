@@ -17,14 +17,17 @@ import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-p
 import { Route as dashboardDashboardIndexRouteImport } from './routes/(dashboard)/dashboard/index'
 import { Route as dashboardDashboardStudioRouteImport } from './routes/(dashboard)/dashboard/studio'
 import { Route as dashboardDashboardSettingsRouteImport } from './routes/(dashboard)/dashboard/settings'
+import { Route as dashboardDashboardQuizzesRouteImport } from './routes/(dashboard)/dashboard/quizzes'
 import { Route as dashboardDashboardCommunityRouteImport } from './routes/(dashboard)/dashboard/community'
-import { Route as dashboardDashboardAnalyticsRouteImport } from './routes/(dashboard)/dashboard/analytics'
 import { Route as dashboardDashboardAssignmentsRouteImport } from './routes/(dashboard)/dashboard/assignments'
+import { Route as dashboardDashboardAnalyticsRouteImport } from './routes/(dashboard)/dashboard/analytics'
 import { Route as dashboardDashboardStudentsIndexRouteImport } from './routes/(dashboard)/dashboard/students/index'
 import { Route as dashboardDashboardStudioCreateRouteImport } from './routes/(dashboard)/dashboard/studio_.create'
 import { Route as dashboardDashboardStudioContentIdRouteImport } from './routes/(dashboard)/dashboard/studio_.$contentId'
 import { Route as dashboardDashboardStudentsCreateRouteImport } from './routes/(dashboard)/dashboard/students/create'
 import { Route as dashboardDashboardStudentsStudentIdRouteImport } from './routes/(dashboard)/dashboard/students/$studentId'
+import { Route as dashboardDashboardQuizzesCreateRouteImport } from './routes/(dashboard)/dashboard/quizzes_.create'
+import { Route as dashboardDashboardQuizzesQuizIdRouteImport } from './routes/(dashboard)/dashboard/quizzes_.$quizId'
 import { Route as dashboardDashboardCommunitySubscriptionEditRouteImport } from './routes/(dashboard)/dashboard/community_.subscription-edit'
 import { Route as dashboardDashboardCommunitySubscriptionCreateRouteImport } from './routes/(dashboard)/dashboard/community_.subscription-create'
 
@@ -70,22 +73,28 @@ const dashboardDashboardSettingsRoute =
     path: '/settings',
     getParentRoute: () => dashboardDashboardRoute,
   } as any)
+const dashboardDashboardQuizzesRoute =
+  dashboardDashboardQuizzesRouteImport.update({
+    id: '/quizzes',
+    path: '/quizzes',
+    getParentRoute: () => dashboardDashboardRoute,
+  } as any)
 const dashboardDashboardCommunityRoute =
   dashboardDashboardCommunityRouteImport.update({
     id: '/community',
     path: '/community',
     getParentRoute: () => dashboardDashboardRoute,
   } as any)
-const dashboardDashboardAnalyticsRoute =
-  dashboardDashboardAnalyticsRouteImport.update({
-    id: '/analytics',
-    path: '/analytics',
-    getParentRoute: () => dashboardDashboardRoute,
-  } as any)
 const dashboardDashboardAssignmentsRoute =
   dashboardDashboardAssignmentsRouteImport.update({
     id: '/assignments',
     path: '/assignments',
+    getParentRoute: () => dashboardDashboardRoute,
+  } as any)
+const dashboardDashboardAnalyticsRoute =
+  dashboardDashboardAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
     getParentRoute: () => dashboardDashboardRoute,
   } as any)
 const dashboardDashboardStudentsIndexRoute =
@@ -118,6 +127,18 @@ const dashboardDashboardStudentsStudentIdRoute =
     path: '/students/$studentId',
     getParentRoute: () => dashboardDashboardRoute,
   } as any)
+const dashboardDashboardQuizzesCreateRoute =
+  dashboardDashboardQuizzesCreateRouteImport.update({
+    id: '/quizzes_/create',
+    path: '/quizzes/create',
+    getParentRoute: () => dashboardDashboardRoute,
+  } as any)
+const dashboardDashboardQuizzesQuizIdRoute =
+  dashboardDashboardQuizzesQuizIdRouteImport.update({
+    id: '/quizzes_/$quizId',
+    path: '/quizzes/$quizId',
+    getParentRoute: () => dashboardDashboardRoute,
+  } as any)
 const dashboardDashboardCommunitySubscriptionEditRoute =
   dashboardDashboardCommunitySubscriptionEditRouteImport.update({
     id: '/community_/subscription-edit',
@@ -138,12 +159,16 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof authResetPasswordRoute
   '/dashboard': typeof dashboardDashboardRouteWithChildren
   '/dashboard/analytics': typeof dashboardDashboardAnalyticsRoute
+  '/dashboard/assignments': typeof dashboardDashboardAssignmentsRoute
   '/dashboard/community': typeof dashboardDashboardCommunityRoute
+  '/dashboard/quizzes': typeof dashboardDashboardQuizzesRoute
   '/dashboard/settings': typeof dashboardDashboardSettingsRoute
   '/dashboard/studio': typeof dashboardDashboardStudioRoute
   '/dashboard/': typeof dashboardDashboardIndexRoute
   '/dashboard/community/subscription-create': typeof dashboardDashboardCommunitySubscriptionCreateRoute
   '/dashboard/community/subscription-edit': typeof dashboardDashboardCommunitySubscriptionEditRoute
+  '/dashboard/quizzes/$quizId': typeof dashboardDashboardQuizzesQuizIdRoute
+  '/dashboard/quizzes/create': typeof dashboardDashboardQuizzesCreateRoute
   '/dashboard/students/$studentId': typeof dashboardDashboardStudentsStudentIdRoute
   '/dashboard/students/create': typeof dashboardDashboardStudentsCreateRoute
   '/dashboard/studio/$contentId': typeof dashboardDashboardStudioContentIdRoute
@@ -158,11 +183,14 @@ export interface FileRoutesByTo {
   '/dashboard/analytics': typeof dashboardDashboardAnalyticsRoute
   '/dashboard/assignments': typeof dashboardDashboardAssignmentsRoute
   '/dashboard/community': typeof dashboardDashboardCommunityRoute
+  '/dashboard/quizzes': typeof dashboardDashboardQuizzesRoute
   '/dashboard/settings': typeof dashboardDashboardSettingsRoute
   '/dashboard/studio': typeof dashboardDashboardStudioRoute
   '/dashboard': typeof dashboardDashboardIndexRoute
   '/dashboard/community/subscription-create': typeof dashboardDashboardCommunitySubscriptionCreateRoute
   '/dashboard/community/subscription-edit': typeof dashboardDashboardCommunitySubscriptionEditRoute
+  '/dashboard/quizzes/$quizId': typeof dashboardDashboardQuizzesQuizIdRoute
+  '/dashboard/quizzes/create': typeof dashboardDashboardQuizzesCreateRoute
   '/dashboard/students/$studentId': typeof dashboardDashboardStudentsStudentIdRoute
   '/dashboard/students/create': typeof dashboardDashboardStudentsCreateRoute
   '/dashboard/studio/$contentId': typeof dashboardDashboardStudioContentIdRoute
@@ -179,11 +207,14 @@ export interface FileRoutesById {
   '/(dashboard)/dashboard/analytics': typeof dashboardDashboardAnalyticsRoute
   '/(dashboard)/dashboard/assignments': typeof dashboardDashboardAssignmentsRoute
   '/(dashboard)/dashboard/community': typeof dashboardDashboardCommunityRoute
+  '/(dashboard)/dashboard/quizzes': typeof dashboardDashboardQuizzesRoute
   '/(dashboard)/dashboard/settings': typeof dashboardDashboardSettingsRoute
   '/(dashboard)/dashboard/studio': typeof dashboardDashboardStudioRoute
   '/(dashboard)/dashboard/': typeof dashboardDashboardIndexRoute
   '/(dashboard)/dashboard/community_/subscription-create': typeof dashboardDashboardCommunitySubscriptionCreateRoute
   '/(dashboard)/dashboard/community_/subscription-edit': typeof dashboardDashboardCommunitySubscriptionEditRoute
+  '/(dashboard)/dashboard/quizzes_/$quizId': typeof dashboardDashboardQuizzesQuizIdRoute
+  '/(dashboard)/dashboard/quizzes_/create': typeof dashboardDashboardQuizzesCreateRoute
   '/(dashboard)/dashboard/students/$studentId': typeof dashboardDashboardStudentsStudentIdRoute
   '/(dashboard)/dashboard/students/create': typeof dashboardDashboardStudentsCreateRoute
   '/(dashboard)/dashboard/studio_/$contentId': typeof dashboardDashboardStudioContentIdRoute
@@ -201,11 +232,14 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/assignments'
     | '/dashboard/community'
+    | '/dashboard/quizzes'
     | '/dashboard/settings'
     | '/dashboard/studio'
     | '/dashboard/'
     | '/dashboard/community/subscription-create'
     | '/dashboard/community/subscription-edit'
+    | '/dashboard/quizzes/$quizId'
+    | '/dashboard/quizzes/create'
     | '/dashboard/students/$studentId'
     | '/dashboard/students/create'
     | '/dashboard/studio/$contentId'
@@ -220,11 +254,14 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/assignments'
     | '/dashboard/community'
+    | '/dashboard/quizzes'
     | '/dashboard/settings'
     | '/dashboard/studio'
     | '/dashboard'
     | '/dashboard/community/subscription-create'
     | '/dashboard/community/subscription-edit'
+    | '/dashboard/quizzes/$quizId'
+    | '/dashboard/quizzes/create'
     | '/dashboard/students/$studentId'
     | '/dashboard/students/create'
     | '/dashboard/studio/$contentId'
@@ -240,11 +277,14 @@ export interface FileRouteTypes {
     | '/(dashboard)/dashboard/analytics'
     | '/(dashboard)/dashboard/assignments'
     | '/(dashboard)/dashboard/community'
+    | '/(dashboard)/dashboard/quizzes'
     | '/(dashboard)/dashboard/settings'
     | '/(dashboard)/dashboard/studio'
     | '/(dashboard)/dashboard/'
     | '/(dashboard)/dashboard/community_/subscription-create'
     | '/(dashboard)/dashboard/community_/subscription-edit'
+    | '/(dashboard)/dashboard/quizzes_/$quizId'
+    | '/(dashboard)/dashboard/quizzes_/create'
     | '/(dashboard)/dashboard/students/$studentId'
     | '/(dashboard)/dashboard/students/create'
     | '/(dashboard)/dashboard/studio_/$contentId'
@@ -318,6 +358,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof dashboardDashboardSettingsRouteImport
       parentRoute: typeof dashboardDashboardRoute
     }
+    '/(dashboard)/dashboard/quizzes': {
+      id: '/(dashboard)/dashboard/quizzes'
+      path: '/quizzes'
+      fullPath: '/dashboard/quizzes'
+      preLoaderRoute: typeof dashboardDashboardQuizzesRouteImport
+      parentRoute: typeof dashboardDashboardRoute
+    }
     '/(dashboard)/dashboard/community': {
       id: '/(dashboard)/dashboard/community'
       path: '/community'
@@ -325,18 +372,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof dashboardDashboardCommunityRouteImport
       parentRoute: typeof dashboardDashboardRoute
     }
-    '/(dashboard)/dashboard/analytics': {
-      id: '/(dashboard)/dashboard/analytics'
-      path: '/analytics'
-      fullPath: '/dashboard/analytics'
-      preLoaderRoute: typeof dashboardDashboardAnalyticsRouteImport
-      parentRoute: typeof dashboardDashboardRoute
-    }
     '/(dashboard)/dashboard/assignments': {
       id: '/(dashboard)/dashboard/assignments'
       path: '/assignments'
       fullPath: '/dashboard/assignments'
       preLoaderRoute: typeof dashboardDashboardAssignmentsRouteImport
+      parentRoute: typeof dashboardDashboardRoute
+    }
+    '/(dashboard)/dashboard/analytics': {
+      id: '/(dashboard)/dashboard/analytics'
+      path: '/analytics'
+      fullPath: '/dashboard/analytics'
+      preLoaderRoute: typeof dashboardDashboardAnalyticsRouteImport
       parentRoute: typeof dashboardDashboardRoute
     }
     '/(dashboard)/dashboard/students/': {
@@ -374,6 +421,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof dashboardDashboardStudentsStudentIdRouteImport
       parentRoute: typeof dashboardDashboardRoute
     }
+    '/(dashboard)/dashboard/quizzes_/create': {
+      id: '/(dashboard)/dashboard/quizzes_/create'
+      path: '/quizzes/create'
+      fullPath: '/dashboard/quizzes/create'
+      preLoaderRoute: typeof dashboardDashboardQuizzesCreateRouteImport
+      parentRoute: typeof dashboardDashboardRoute
+    }
+    '/(dashboard)/dashboard/quizzes_/$quizId': {
+      id: '/(dashboard)/dashboard/quizzes_/$quizId'
+      path: '/quizzes/$quizId'
+      fullPath: '/dashboard/quizzes/$quizId'
+      preLoaderRoute: typeof dashboardDashboardQuizzesQuizIdRouteImport
+      parentRoute: typeof dashboardDashboardRoute
+    }
     '/(dashboard)/dashboard/community_/subscription-edit': {
       id: '/(dashboard)/dashboard/community_/subscription-edit'
       path: '/community/subscription-edit'
@@ -395,11 +456,14 @@ interface dashboardDashboardRouteChildren {
   dashboardDashboardAnalyticsRoute: typeof dashboardDashboardAnalyticsRoute
   dashboardDashboardAssignmentsRoute: typeof dashboardDashboardAssignmentsRoute
   dashboardDashboardCommunityRoute: typeof dashboardDashboardCommunityRoute
+  dashboardDashboardQuizzesRoute: typeof dashboardDashboardQuizzesRoute
   dashboardDashboardSettingsRoute: typeof dashboardDashboardSettingsRoute
   dashboardDashboardStudioRoute: typeof dashboardDashboardStudioRoute
   dashboardDashboardIndexRoute: typeof dashboardDashboardIndexRoute
   dashboardDashboardCommunitySubscriptionCreateRoute: typeof dashboardDashboardCommunitySubscriptionCreateRoute
   dashboardDashboardCommunitySubscriptionEditRoute: typeof dashboardDashboardCommunitySubscriptionEditRoute
+  dashboardDashboardQuizzesQuizIdRoute: typeof dashboardDashboardQuizzesQuizIdRoute
+  dashboardDashboardQuizzesCreateRoute: typeof dashboardDashboardQuizzesCreateRoute
   dashboardDashboardStudentsStudentIdRoute: typeof dashboardDashboardStudentsStudentIdRoute
   dashboardDashboardStudentsCreateRoute: typeof dashboardDashboardStudentsCreateRoute
   dashboardDashboardStudioContentIdRoute: typeof dashboardDashboardStudioContentIdRoute
@@ -411,6 +475,7 @@ const dashboardDashboardRouteChildren: dashboardDashboardRouteChildren = {
   dashboardDashboardAnalyticsRoute: dashboardDashboardAnalyticsRoute,
   dashboardDashboardAssignmentsRoute: dashboardDashboardAssignmentsRoute,
   dashboardDashboardCommunityRoute: dashboardDashboardCommunityRoute,
+  dashboardDashboardQuizzesRoute: dashboardDashboardQuizzesRoute,
   dashboardDashboardSettingsRoute: dashboardDashboardSettingsRoute,
   dashboardDashboardStudioRoute: dashboardDashboardStudioRoute,
   dashboardDashboardIndexRoute: dashboardDashboardIndexRoute,
@@ -418,6 +483,8 @@ const dashboardDashboardRouteChildren: dashboardDashboardRouteChildren = {
     dashboardDashboardCommunitySubscriptionCreateRoute,
   dashboardDashboardCommunitySubscriptionEditRoute:
     dashboardDashboardCommunitySubscriptionEditRoute,
+  dashboardDashboardQuizzesQuizIdRoute: dashboardDashboardQuizzesQuizIdRoute,
+  dashboardDashboardQuizzesCreateRoute: dashboardDashboardQuizzesCreateRoute,
   dashboardDashboardStudentsStudentIdRoute:
     dashboardDashboardStudentsStudentIdRoute,
   dashboardDashboardStudentsCreateRoute: dashboardDashboardStudentsCreateRoute,
