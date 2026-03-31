@@ -22,6 +22,7 @@ import { Route as dashboardDashboardCommunityRouteImport } from './routes/(dashb
 import { Route as dashboardDashboardAssignmentsRouteImport } from './routes/(dashboard)/dashboard/assignments'
 import { Route as dashboardDashboardAnalyticsRouteImport } from './routes/(dashboard)/dashboard/analytics'
 import { Route as dashboardDashboardStudentsIndexRouteImport } from './routes/(dashboard)/dashboard/students/index'
+import { Route as dashboardDashboardClassesIndexRouteImport } from './routes/(dashboard)/dashboard/classes/index'
 import { Route as dashboardDashboardStudioCreateRouteImport } from './routes/(dashboard)/dashboard/studio_.create'
 import { Route as dashboardDashboardStudioContentIdRouteImport } from './routes/(dashboard)/dashboard/studio_.$contentId'
 import { Route as dashboardDashboardStudentsCreateRouteImport } from './routes/(dashboard)/dashboard/students/create'
@@ -30,6 +31,8 @@ import { Route as dashboardDashboardQuizzesCreateRouteImport } from './routes/(d
 import { Route as dashboardDashboardQuizzesQuizIdRouteImport } from './routes/(dashboard)/dashboard/quizzes_.$quizId'
 import { Route as dashboardDashboardCommunitySubscriptionEditRouteImport } from './routes/(dashboard)/dashboard/community_.subscription-edit'
 import { Route as dashboardDashboardCommunitySubscriptionCreateRouteImport } from './routes/(dashboard)/dashboard/community_.subscription-create'
+import { Route as dashboardDashboardClassesCreateRouteImport } from './routes/(dashboard)/dashboard/classes/create'
+import { Route as dashboardDashboardClassesClassIdRouteImport } from './routes/(dashboard)/dashboard/classes/$classId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -103,6 +106,12 @@ const dashboardDashboardStudentsIndexRoute =
     path: '/students/',
     getParentRoute: () => dashboardDashboardRoute,
   } as any)
+const dashboardDashboardClassesIndexRoute =
+  dashboardDashboardClassesIndexRouteImport.update({
+    id: '/classes/',
+    path: '/classes/',
+    getParentRoute: () => dashboardDashboardRoute,
+  } as any)
 const dashboardDashboardStudioCreateRoute =
   dashboardDashboardStudioCreateRouteImport.update({
     id: '/studio_/create',
@@ -151,6 +160,18 @@ const dashboardDashboardCommunitySubscriptionCreateRoute =
     path: '/community/subscription-create',
     getParentRoute: () => dashboardDashboardRoute,
   } as any)
+const dashboardDashboardClassesCreateRoute =
+  dashboardDashboardClassesCreateRouteImport.update({
+    id: '/classes/create',
+    path: '/classes/create',
+    getParentRoute: () => dashboardDashboardRoute,
+  } as any)
+const dashboardDashboardClassesClassIdRoute =
+  dashboardDashboardClassesClassIdRouteImport.update({
+    id: '/classes/$classId',
+    path: '/classes/$classId',
+    getParentRoute: () => dashboardDashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -165,6 +186,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings': typeof dashboardDashboardSettingsRoute
   '/dashboard/studio': typeof dashboardDashboardStudioRoute
   '/dashboard/': typeof dashboardDashboardIndexRoute
+  '/dashboard/classes/$classId': typeof dashboardDashboardClassesClassIdRoute
+  '/dashboard/classes/create': typeof dashboardDashboardClassesCreateRoute
   '/dashboard/community/subscription-create': typeof dashboardDashboardCommunitySubscriptionCreateRoute
   '/dashboard/community/subscription-edit': typeof dashboardDashboardCommunitySubscriptionEditRoute
   '/dashboard/quizzes/$quizId': typeof dashboardDashboardQuizzesQuizIdRoute
@@ -173,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/students/create': typeof dashboardDashboardStudentsCreateRoute
   '/dashboard/studio/$contentId': typeof dashboardDashboardStudioContentIdRoute
   '/dashboard/studio/create': typeof dashboardDashboardStudioCreateRoute
+  '/dashboard/classes/': typeof dashboardDashboardClassesIndexRoute
   '/dashboard/students/': typeof dashboardDashboardStudentsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -187,6 +211,8 @@ export interface FileRoutesByTo {
   '/dashboard/settings': typeof dashboardDashboardSettingsRoute
   '/dashboard/studio': typeof dashboardDashboardStudioRoute
   '/dashboard': typeof dashboardDashboardIndexRoute
+  '/dashboard/classes/$classId': typeof dashboardDashboardClassesClassIdRoute
+  '/dashboard/classes/create': typeof dashboardDashboardClassesCreateRoute
   '/dashboard/community/subscription-create': typeof dashboardDashboardCommunitySubscriptionCreateRoute
   '/dashboard/community/subscription-edit': typeof dashboardDashboardCommunitySubscriptionEditRoute
   '/dashboard/quizzes/$quizId': typeof dashboardDashboardQuizzesQuizIdRoute
@@ -195,6 +221,7 @@ export interface FileRoutesByTo {
   '/dashboard/students/create': typeof dashboardDashboardStudentsCreateRoute
   '/dashboard/studio/$contentId': typeof dashboardDashboardStudioContentIdRoute
   '/dashboard/studio/create': typeof dashboardDashboardStudioCreateRoute
+  '/dashboard/classes': typeof dashboardDashboardClassesIndexRoute
   '/dashboard/students': typeof dashboardDashboardStudentsIndexRoute
 }
 export interface FileRoutesById {
@@ -211,6 +238,8 @@ export interface FileRoutesById {
   '/(dashboard)/dashboard/settings': typeof dashboardDashboardSettingsRoute
   '/(dashboard)/dashboard/studio': typeof dashboardDashboardStudioRoute
   '/(dashboard)/dashboard/': typeof dashboardDashboardIndexRoute
+  '/(dashboard)/dashboard/classes/$classId': typeof dashboardDashboardClassesClassIdRoute
+  '/(dashboard)/dashboard/classes/create': typeof dashboardDashboardClassesCreateRoute
   '/(dashboard)/dashboard/community_/subscription-create': typeof dashboardDashboardCommunitySubscriptionCreateRoute
   '/(dashboard)/dashboard/community_/subscription-edit': typeof dashboardDashboardCommunitySubscriptionEditRoute
   '/(dashboard)/dashboard/quizzes_/$quizId': typeof dashboardDashboardQuizzesQuizIdRoute
@@ -219,6 +248,7 @@ export interface FileRoutesById {
   '/(dashboard)/dashboard/students/create': typeof dashboardDashboardStudentsCreateRoute
   '/(dashboard)/dashboard/studio_/$contentId': typeof dashboardDashboardStudioContentIdRoute
   '/(dashboard)/dashboard/studio_/create': typeof dashboardDashboardStudioCreateRoute
+  '/(dashboard)/dashboard/classes/': typeof dashboardDashboardClassesIndexRoute
   '/(dashboard)/dashboard/students/': typeof dashboardDashboardStudentsIndexRoute
 }
 export interface FileRouteTypes {
@@ -236,6 +266,8 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/studio'
     | '/dashboard/'
+    | '/dashboard/classes/$classId'
+    | '/dashboard/classes/create'
     | '/dashboard/community/subscription-create'
     | '/dashboard/community/subscription-edit'
     | '/dashboard/quizzes/$quizId'
@@ -244,6 +276,7 @@ export interface FileRouteTypes {
     | '/dashboard/students/create'
     | '/dashboard/studio/$contentId'
     | '/dashboard/studio/create'
+    | '/dashboard/classes/'
     | '/dashboard/students/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -258,6 +291,8 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/studio'
     | '/dashboard'
+    | '/dashboard/classes/$classId'
+    | '/dashboard/classes/create'
     | '/dashboard/community/subscription-create'
     | '/dashboard/community/subscription-edit'
     | '/dashboard/quizzes/$quizId'
@@ -266,6 +301,7 @@ export interface FileRouteTypes {
     | '/dashboard/students/create'
     | '/dashboard/studio/$contentId'
     | '/dashboard/studio/create'
+    | '/dashboard/classes'
     | '/dashboard/students'
   id:
     | '__root__'
@@ -281,6 +317,8 @@ export interface FileRouteTypes {
     | '/(dashboard)/dashboard/settings'
     | '/(dashboard)/dashboard/studio'
     | '/(dashboard)/dashboard/'
+    | '/(dashboard)/dashboard/classes/$classId'
+    | '/(dashboard)/dashboard/classes/create'
     | '/(dashboard)/dashboard/community_/subscription-create'
     | '/(dashboard)/dashboard/community_/subscription-edit'
     | '/(dashboard)/dashboard/quizzes_/$quizId'
@@ -289,6 +327,7 @@ export interface FileRouteTypes {
     | '/(dashboard)/dashboard/students/create'
     | '/(dashboard)/dashboard/studio_/$contentId'
     | '/(dashboard)/dashboard/studio_/create'
+    | '/(dashboard)/dashboard/classes/'
     | '/(dashboard)/dashboard/students/'
   fileRoutesById: FileRoutesById
 }
@@ -393,6 +432,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof dashboardDashboardStudentsIndexRouteImport
       parentRoute: typeof dashboardDashboardRoute
     }
+    '/(dashboard)/dashboard/classes/': {
+      id: '/(dashboard)/dashboard/classes/'
+      path: '/classes'
+      fullPath: '/dashboard/classes/'
+      preLoaderRoute: typeof dashboardDashboardClassesIndexRouteImport
+      parentRoute: typeof dashboardDashboardRoute
+    }
     '/(dashboard)/dashboard/studio_/create': {
       id: '/(dashboard)/dashboard/studio_/create'
       path: '/studio/create'
@@ -449,6 +495,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof dashboardDashboardCommunitySubscriptionCreateRouteImport
       parentRoute: typeof dashboardDashboardRoute
     }
+    '/(dashboard)/dashboard/classes/create': {
+      id: '/(dashboard)/dashboard/classes/create'
+      path: '/classes/create'
+      fullPath: '/dashboard/classes/create'
+      preLoaderRoute: typeof dashboardDashboardClassesCreateRouteImport
+      parentRoute: typeof dashboardDashboardRoute
+    }
+    '/(dashboard)/dashboard/classes/$classId': {
+      id: '/(dashboard)/dashboard/classes/$classId'
+      path: '/classes/$classId'
+      fullPath: '/dashboard/classes/$classId'
+      preLoaderRoute: typeof dashboardDashboardClassesClassIdRouteImport
+      parentRoute: typeof dashboardDashboardRoute
+    }
   }
 }
 
@@ -460,6 +520,8 @@ interface dashboardDashboardRouteChildren {
   dashboardDashboardSettingsRoute: typeof dashboardDashboardSettingsRoute
   dashboardDashboardStudioRoute: typeof dashboardDashboardStudioRoute
   dashboardDashboardIndexRoute: typeof dashboardDashboardIndexRoute
+  dashboardDashboardClassesClassIdRoute: typeof dashboardDashboardClassesClassIdRoute
+  dashboardDashboardClassesCreateRoute: typeof dashboardDashboardClassesCreateRoute
   dashboardDashboardCommunitySubscriptionCreateRoute: typeof dashboardDashboardCommunitySubscriptionCreateRoute
   dashboardDashboardCommunitySubscriptionEditRoute: typeof dashboardDashboardCommunitySubscriptionEditRoute
   dashboardDashboardQuizzesQuizIdRoute: typeof dashboardDashboardQuizzesQuizIdRoute
@@ -468,6 +530,7 @@ interface dashboardDashboardRouteChildren {
   dashboardDashboardStudentsCreateRoute: typeof dashboardDashboardStudentsCreateRoute
   dashboardDashboardStudioContentIdRoute: typeof dashboardDashboardStudioContentIdRoute
   dashboardDashboardStudioCreateRoute: typeof dashboardDashboardStudioCreateRoute
+  dashboardDashboardClassesIndexRoute: typeof dashboardDashboardClassesIndexRoute
   dashboardDashboardStudentsIndexRoute: typeof dashboardDashboardStudentsIndexRoute
 }
 
@@ -479,6 +542,8 @@ const dashboardDashboardRouteChildren: dashboardDashboardRouteChildren = {
   dashboardDashboardSettingsRoute: dashboardDashboardSettingsRoute,
   dashboardDashboardStudioRoute: dashboardDashboardStudioRoute,
   dashboardDashboardIndexRoute: dashboardDashboardIndexRoute,
+  dashboardDashboardClassesClassIdRoute: dashboardDashboardClassesClassIdRoute,
+  dashboardDashboardClassesCreateRoute: dashboardDashboardClassesCreateRoute,
   dashboardDashboardCommunitySubscriptionCreateRoute:
     dashboardDashboardCommunitySubscriptionCreateRoute,
   dashboardDashboardCommunitySubscriptionEditRoute:
@@ -491,6 +556,7 @@ const dashboardDashboardRouteChildren: dashboardDashboardRouteChildren = {
   dashboardDashboardStudioContentIdRoute:
     dashboardDashboardStudioContentIdRoute,
   dashboardDashboardStudioCreateRoute: dashboardDashboardStudioCreateRoute,
+  dashboardDashboardClassesIndexRoute: dashboardDashboardClassesIndexRoute,
   dashboardDashboardStudentsIndexRoute: dashboardDashboardStudentsIndexRoute,
 }
 

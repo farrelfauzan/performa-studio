@@ -10,6 +10,7 @@ import {
   GraduationCap,
   ClipboardList,
   FileQuestion,
+  School,
 } from 'lucide-react'
 import { logoutFn } from '@/server/auth'
 import { useAuthStore } from '@/stores/auth-store'
@@ -51,6 +52,11 @@ const sidebarItems = [
     label: 'Students',
     to: '/dashboard/students',
     icon: GraduationCap,
+  },
+  {
+    label: 'Classes',
+    to: '/dashboard/classes',
+    icon: School,
   },
   {
     label: 'Assignments',
