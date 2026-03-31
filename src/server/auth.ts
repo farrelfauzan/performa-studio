@@ -80,8 +80,6 @@ export const loginFn = createServerFn({ method: 'POST' })
         }),
       })
 
-      console.log('Login response status:', res)
-
       if (!res.ok) {
         const error = await res.json().catch(() => null)
         return {
@@ -107,8 +105,6 @@ export const loginFn = createServerFn({ method: 'POST' })
       }
 
       const { accessToken, refreshToken, user: loginUser } = json.data
-
-      console.log('Access Token:', accessToken)
 
       // Store tokens in httpOnly cookies (7 days)
       const cookieOpts = {
