@@ -36,6 +36,13 @@ import type {
   QuizAnalyticsResponse,
   AttemptHistoryResponse,
   QuestionPictureUploadUrlResponse,
+  ClassListResponse,
+  ClassResponse,
+  CreateClassPayload,
+  UpdateClassPayload,
+  ClassTeachersResponse,
+  ClassStudentsResponse,
+  CustomerListResponse,
 } from './types'
 
 // ─── Auth API ────────────────────────────────────────────────────────────
@@ -268,6 +275,8 @@ export const quizApi = {
 
 // ─── S3 Upload Helper ────────────────────────────────────────────────────
 
+// ─── S3 Upload Helper ────────────────────────────────────────────────────
+
 export async function uploadToS3(
   uploadUrl: string,
   fields: Record<string, string>,
@@ -288,4 +297,64 @@ export async function uploadToS3(
   if (!response.ok) {
     throw new Error(`Upload failed: ${response.statusText}`)
   }
+}
+
+// ─── Customer (Teacher) API ──────────────────────────────────────────────
+
+export const customerApi = {
+  getAll: (params?: PageParams) =>
+    apiClient.get<CustomerListResponse>('/v1/customers', { params }),
+}
+
+// ─── Class API ───────────────────────────────────────────────────────────
+
+export const classApi = {
+  getAll: (params?: PageParams) =>
+    apiClient.get<ClassListResponse>('/v1/classes', { params }),
+
+  getById: (id: string) =>
+    apiClient.get<ClassResponse>(`/v1/classes/${encodeURIComponent(id)}`),
+
+  create: (data: CreateClassPayload) =>
+    apiClient.post<ClassResponse>('/v1/classes', data),
+
+  update: (id: string, data: UpdateClassPayload) =>
+    apiClient.put<ClassResponse>(`/v1/classes/${encodeURIComponent(id)}`, data),
+
+  delete: (id: string) =>
+    apiClient.delete(`/v1/classes/${encodeURIComponent(id)}`),
+
+  // Teacher membership
+  getTeachers: (id: string, params?: PageParams) =>
+    apiClient.get<ClassTeachersResponse>(
+      `/v1/classes/${encodeURIComponent(id)}/teachers`,
+      { params },
+    ),
+
+  addTeachers: (id: string, customerIds: string[]) =>
+    apiClient.post(`/v1/classes/${encodeURIComponent(id)}/teachers`, {
+      customerIds,
+    }),
+
+  removeTeacher: (id: string, customerId: string) =>
+    apiClient.delete(
+      `/v1/classes/${encodeURIComponent(id)}/teachers/${encodeURIComponent(customerId)}`,
+    ),
+
+  // Student membership
+  getStudents: (id: string, params?: PageParams) =>
+    apiClient.get<ClassStudentsResponse>(
+      `/v1/classes/${encodeURIComponent(id)}/students`,
+      { params },
+    ),
+
+  addStudents: (id: string, studentIds: string[]) =>
+    apiClient.post(`/v1/classes/${encodeURIComponent(id)}/students`, {
+      studentIds,
+    }),
+
+  removeStudent: (id: string, studentId: string) =>
+    apiClient.delete(
+      `/v1/classes/${encodeURIComponent(id)}/students/${encodeURIComponent(studentId)}`,
+    ),
 }

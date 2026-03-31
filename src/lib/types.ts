@@ -528,3 +528,69 @@ export type QuestionPictureUploadUrlResponse = {
     expiresIn: number
   }
 }
+
+// ─── Customer (Teacher) Types ───────────────────────────────────────────
+
+export type Customer = {
+  id: string
+  uniqueId: string
+  fullName: string
+  phoneNumber: string
+  dateOfBirth: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export type CustomerListResponse = PaginatedResponse<Customer>
+
+// ─── Class Types ────────────────────────────────────────────────────────
+
+export type Class = {
+  id: string
+  uniqueId: string
+  createdBy: string
+  name: string
+  description: string | null
+  active: 'ACTIVE' | 'INACTIVE'
+  teacherCount: number
+  studentCount: number
+  createdAt: string
+  updatedAt: string
+}
+
+export type CreateClassPayload = {
+  name: string
+  description?: string
+}
+
+export type UpdateClassPayload = {
+  name?: string
+  description?: string
+  active?: 'ACTIVE' | 'INACTIVE'
+}
+
+export type ClassTeacherItem = {
+  id: string
+  customerId: string
+  fullName: string
+  profilePictureUrl: string | null
+  joinedAt: string
+}
+
+export type ClassStudentItem = {
+  id: string
+  studentId: string
+  fullName: string
+  profilePictureUrl: string | null
+  joinedAt: string
+}
+
+export type ClassListResponse = PaginatedResponse<Class>
+
+export type ClassResponse = {
+  data: Class
+}
+
+export type ClassTeachersResponse = PaginatedResponse<ClassTeacherItem>
+
+export type ClassStudentsResponse = PaginatedResponse<ClassStudentItem>
